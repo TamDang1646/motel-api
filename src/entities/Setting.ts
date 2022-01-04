@@ -1,13 +1,13 @@
 import {
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
+    BaseEntity,
+    Column,
+    Entity,
+    PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { ApiProperty } from "@nestjs/swagger";
 
-@Entity("setting")
+@Entity("fjob_setting")
 export class Setting extends BaseEntity {
     @PrimaryGeneratedColumn({ type: "int", name: "id" })
     @ApiProperty()
