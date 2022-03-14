@@ -1,5 +1,8 @@
 import { isString } from "class-validator";
-import { FastifyReply as Response } from "fastify";
+import {
+  FastifyReply as Response,
+  FastifyRequest as Request,
+} from "fastify";
 import { ErrorCodes } from "src/constants/error-code.const";
 import { BaseError } from "src/exceptions/errors/base.error";
 import { DatabaseError } from "src/exceptions/errors/database.error";
@@ -13,45 +16,51 @@ import {
   ForbiddenException,
   HttpException,
   HttpStatus,
+  Injectable,
 } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
-
-import { LoggerService } from "../logger/custom.logger";
+import { ConfigService } from "@nestjs/config";
+import { SentryService } from "@ntegral/nestjs-sentry";
+import * as Sentry from "@sentry/node";
+import { Primitive } from "@sentry/types";
 
 @Catch()
+@Injectable()
 export class AllExceptionFilter implements ExceptionFilter {
-    constructor(private logger: LoggerService) { }
+    constructor(
+        private readonly sentryService: SentryService,
+        private readonly configService: ConfigService,
+    ) { }
 
     private static handleResponse(
         response: Response,
         exception: HttpException | DatabaseError | QueryFailedError | Error | BaseError,
-    ): void {
-        let responseBody: unknown = { message: "Internal server error" };
-        let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-
+    ): [number, number] {
+        let responseBody: unknown = { message: "Internal server error" }
+        let statusCode = HttpStatus.INTERNAL_SERVER_ERROR
+        let errorCode: number
 
         if (exception instanceof ForbiddenException) {
-            statusCode = exception.getStatus();
-
+            statusCode = exception.getStatus()
+            errorCode = ErrorCodes.INVALID_HEADERS
             if (isDebug()) {
                 responseBody = {
                     message: "Invalid Header",
-                    errorCode: ErrorCodes.INVALID_HEADERS,
+                    errorCode: errorCode,
                     cause: exception.message + ": Invalid Header",
                 }
             } else {
                 responseBody = {
                     message: "Invalid Header",
-                    errorCode: ErrorCodes.INVALID_HEADERS
+                    errorCode: errorCode
                 }
             }
 
         } else if (exception instanceof HttpException) {
-            const response = exception.getResponse();
+            const response = exception.getResponse()
             // const i18n = new MessageComponent()
 
             let message: unknown
-            let errorCode: unknown
             let cause: unknown
 
             if (isString(response)) {
@@ -62,7 +71,7 @@ export class AllExceptionFilter implements ExceptionFilter {
                 const res = response as Record<string, unknown>
 
                 message = res.message || "Unknown error"
-                errorCode = res.errorCode || ErrorCodes.UNKNOWN
+                errorCode = res.errorCode as number || ErrorCodes.UNKNOWN
                 cause = res.cause || ""
             }
 
@@ -79,105 +88,170 @@ export class AllExceptionFilter implements ExceptionFilter {
                 }
             }
 
-            statusCode = exception.getStatus();
+            statusCode = exception.getStatus()
         } else if (exception instanceof DatabaseError) {
-            statusCode = HttpStatus.BAD_REQUEST;
-
+            statusCode = HttpStatus.BAD_REQUEST
+            errorCode = exception.getErrorCode()
             if (isDebug()) {
                 responseBody = {
-                    errorCode: exception.getErrorCode(),
+                    errorCode: errorCode,
                     message: exception.message,
                     cause: exception.getCause()
                 }
             } else {
                 responseBody = {
-                    errorCode: exception.getErrorCode(),
+                    errorCode: errorCode,
                     message: exception.message,
-                };
+                }
             }
 
         } else if (exception instanceof BaseError) {
-            statusCode = HttpStatus.BAD_REQUEST;
-
+            statusCode = HttpStatus.BAD_REQUEST
+            errorCode = exception.getErrorCode()
             if (isDebug()) {
                 responseBody = {
-                    errorCode: exception.getErrorCode(),
+                    errorCode,
                     message: exception.message,
                     cause: exception.getCause()
                 }
             } else {
                 responseBody = {
-                    errorCode: exception.getErrorCode(),
+                    errorCode,
                     message: exception.message,
-                };
+                }
             }
         } else if (exception instanceof QueryFailedError) {
-            statusCode = HttpStatus.BAD_REQUEST;
+            statusCode = HttpStatus.BAD_REQUEST
+            errorCode = ErrorCodes.UNKNOWN
             responseBody = {
-                errorCode: ErrorCodes.UNKNOWN,
+                errorCode,
                 message: exception.message,
-            };
+            }
 
             if (isDebug()) {
                 responseBody = {
-                    errorCode: ErrorCodes.UNKNOWN,
+                    errorCode,
                     message: "Query database error.",
                     cause: exception
                 }
             } else {
                 responseBody = {
-                    errorCode: ErrorCodes.UNKNOWN,
+                    errorCode,
                     message: "Query database error."
                 }
             }
         } else if (exception instanceof Error) {
+            errorCode = ErrorCodes.UNKNOWN
             if (isDebug()) {
                 responseBody = {
-                    errorCode: ErrorCodes.UNKNOWN,
+                    errorCode,
                     message: "An error occurred, please try again.",
                     cause: exception.message
                 }
             } else {
                 responseBody = {
-                    errorCode: ErrorCodes.UNKNOWN,
+                    errorCode,
                     message: "An error occurred, please try again"
                 }
             }
         }
 
-        void response.status(statusCode).send(responseBody);
-    }
-
-    catch(exception: HttpException | Error, host: ArgumentsHost): void {
-        const ctx: HttpArgumentsHost = host.switchToHttp();
-        const response: Response = ctx.getResponse();
-
-        // Handling error message and logging
-        this.handleMessage(exception);
-
-        // Response to client
-        AllExceptionFilter.handleResponse(response, exception);
+        void response.status(statusCode).send(responseBody)
+        return [statusCode, errorCode]
     }
 
     /**
-   * @param exception 
-   */
+     * @param  {Request} request
+     * @returns void
+     */
+    private handleInfoSentry(sentry: typeof Sentry, request: Request, statusCode: number): void {
+        if (request) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            sentry.setTag("ip", JSON.stringify(request.headers["X-FORWARDED-FOR"]) + "," + request.ip)
+            sentry.setTag("queryquery", JSON.stringify(request.query))
+            sentry.setTag("method", request.method)
+
+            sentry.setExtra("body", request.body)
+
+            sentry.setTag("userAgent", request.headers["user-agent"])
+            sentry.setTag("logLevel", this.configService.get<Primitive>("logLevel"))
+            sentry.setTag("nodeEnv", this.configService.get<Primitive>("nodeEnv"))
+
+            const url: string = request.headers["x-envoy-original-path"] ? request.headers["x-envoy-original-path"] as string : request.url
+            sentry.setTag("url", `${request.hostname}${url}`)
+
+            sentry.setTag("statusCode", statusCode)
+
+            if (request.body["platform"]) {
+                sentry.setTag("platform", JSON.stringify(request.body["platform"]))
+            }
+
+            if (request.body["appVersion"]) {
+                sentry.setTag("appVersion", JSON.stringify(request.body["appVersion"]))
+            }
+
+            if (request.body["buildNumber"]) {
+                sentry.setTag("buildNumber", JSON.stringify(request.body["buildNumber"]))
+            }
+
+            if (request.headers["x-request-id"]) {
+                sentry.setTag("x-request-id", JSON.stringify(request.headers["x-request-id"]))
+            }
+
+            if (request.headers["x-fjob-role"]) {
+                sentry.setTag("x-fjob-role", JSON.stringify(request.headers["x-fjob-role"]))
+            }
+
+            if (request.headers["x-fjob-code"]) {
+                sentry.setTag("x-fjob-code", JSON.stringify(request.headers["x-fjob-code"]))
+            }
+
+            if (request.headers["x-fjob-id"]) {
+                sentry.setTag("x-fjob-id", JSON.stringify(request.headers["x-fjob-id"]))
+            }
+        }
+    }
+
+    catch(exception: HttpException | Error, host: ArgumentsHost): void {
+        const ctx: HttpArgumentsHost = host.switchToHttp()
+        const response: Response = ctx.getResponse()
+
+        const [statusCode, errorCode] = AllExceptionFilter.handleResponse(response, exception)
+
+        if (
+            errorCode !== 9104 &&
+            errorCode !== 1011 &&
+            errorCode !== 7200 &&
+            errorCode !== 7201
+        ) {
+            const sentry: typeof Sentry = this.sentryService.instance()
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            this.handleInfoSentry(sentry, host.getArgs()[0] as Request, statusCode)
+            sentry.captureException(exception);
+        }
+    }
+
+    /**
+       * @param exception 
+       */
     private handleMessage(
         exception: HttpException | DatabaseError | QueryFailedError | Error,
-    ): void {
+    ): string {
 
-        let message = "Internal Server Error";
+        let message = "Internal Server Error"
 
         if (exception instanceof HttpException) {
-            message = JSON.stringify(exception.getResponse());
+            message = JSON.stringify(exception.getResponse())
         } else if (exception instanceof DatabaseError) {
-            message = exception.message;
+            message = exception.message
         } else if (exception instanceof QueryFailedError) {
-            message = exception.stack.toString();
+            message = exception.stack.toString()
         } else if (exception instanceof Error) {
-            message = exception.stack.toString();
+            message = exception.stack.toString()
         }
 
-        this.logger.error(message);
+        return message
     }
 }
+
+

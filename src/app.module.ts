@@ -12,6 +12,7 @@ import {
   Reflector,
 } from "@nestjs/core";
 import { ScheduleModule } from "@nestjs/schedule";
+import { SentryModule } from "@ntegral/nestjs-sentry";
 import { RedisModule } from "@svtslv/nestjs-ioredis";
 
 import { AppController } from "./app.controller";
@@ -37,6 +38,17 @@ import { UserModule } from "./modules/user/user.module";
         ConfigModule.forRoot({
             isGlobal: true,
             load: [appConfig, databaseConfig],
+        }),
+        SentryModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: async (cfg: ConfigService) => ({
+                dsn: cfg.get("SENTRY_DSN"),
+                debug: true,
+                environment: "dev",
+                //   release: 'some_release', | null, // must create a release in sentry.io dashboard
+                logLevel: 3 //based on sentry.io sublevel //
+            }),
+            inject: [ConfigService],
         }),
         ScheduleModule.forRoot(),
         RedisModule.forRootAsync({

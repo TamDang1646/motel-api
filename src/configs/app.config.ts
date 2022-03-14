@@ -5,5 +5,6 @@ export default (): Record<string, unknown> => ({
     redisUri: process.env.REDIS_URI,
     rabbitmqUri: process.env.RABBITMQ_URI,
     DEFAULT_AVATAR: "https://storage.googleapis.com/fjob-dev/default-avatar.png",
-    logLevel: process.env.LOG_LEVEL
+    logLevel: process.env.LOG_LEVEL,
+    SENTRY_DSN: process.env.SENTRY_DSN,
 })
