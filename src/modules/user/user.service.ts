@@ -51,7 +51,7 @@ export class UserService extends BaseService<User, UserRepository> {
 
         const result = await this.getOne(
             { code },
-            { select: (!getFullInfo && fields) ? fields as (keyof User)[] : null }
+            (!getFullInfo && fields) ? fields : null
         )
 
         if (!result) throw new DatabaseError(

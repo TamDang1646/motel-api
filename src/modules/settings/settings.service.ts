@@ -1,4 +1,3 @@
-import { ValueType } from "ioredis";
 import { BaseService } from "src/base/base.service";
 import RedisComponent from "src/components/redis.component";
 import { DefaultSetting } from "src/constants/app-setting";
@@ -80,7 +79,7 @@ export class SettingsService extends BaseService<Setting, SettingRepository> {
             const val = await this.getSetting(name, defaultValue)
 
             if (val) {
-                await this.redis.set(name, val as ValueType, DefaultSetting.DEFAULT_CACHE_SETTING)
+                await this.redis.set(name, val as string | Buffer | number, DefaultSetting.DEFAULT_CACHE_SETTING)
 
                 return val as unknown as T
             }

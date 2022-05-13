@@ -1,5 +1,3 @@
-import { ValueType } from "ioredis";
-
 import { Injectable } from "@nestjs/common";
 import {
   InjectRedis,
@@ -17,7 +15,7 @@ export default class RedisComponent {
      * @param  {number} expireTime
      * @returns Promise
      */
-    async set(key: string, data: ValueType, expireTime: number = 60): Promise<void> {
+    async set(key: string, data: string | Buffer | number, expireTime: number = 60): Promise<void> {
         if (data !== null) {
             if (expireTime === 0) {
                 await this.redis.set(key, data)
@@ -41,7 +39,7 @@ export default class RedisComponent {
      * @param  {number} expireTime
      * @returns Promise
      */
-    async setJson(key: string, data: ValueType | Object, expireTime: number = 60): Promise<boolean> {
+    async setJson(key: string, data: string | Buffer | number | Object, expireTime: number = 60): Promise<boolean> {
         if (data !== null) {
             if (expireTime === 0) {
                 const result = await this.redis.set(key, JSON.stringify(data))
@@ -85,7 +83,7 @@ export default class RedisComponent {
      * @param fields
      * @returns {Promise<*>}
      */
-    async hmSet(key: string, fields: Map<string, ValueType>): Promise<"OK"> {
+    async hmSet(key: string, fields: Map<string, string | Buffer | number>): Promise<"OK"> {
         return this.redis.hmset(key, fields)
     }
 

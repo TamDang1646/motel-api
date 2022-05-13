@@ -9,11 +9,14 @@ import { throwNotFound } from "src/utils/throw-exception.util";
 import {
   BaseEntity,
   DeleteResult,
+  FindCondition,
   FindConditions,
   FindManyOptions,
   FindOneOptions,
+  ObjectID,
   Repository,
   SelectQueryBuilder,
+  UpdateResult,
 } from "typeorm";
 import { EntityId } from "typeorm/repository/EntityId";
 
@@ -54,7 +57,7 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
      * @param {EntityId} id 
      * @returns Promise<T>
      */
-    findById(id: EntityId): Promise<T> {
+    findById(id?: string | number): Promise<T> {
         return this.repository.findOne(id)
     }
 
@@ -75,22 +78,25 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     }
 
     /**
-     * @param {number} id 
-     * @param {string[]} fields 
      * @returns Promise<T>
      */
-    async findOne(id: number, fields?: string[]): Promise<T> {
-        return this.repository.findOne(id, {
-            select: (fields) ? fields as (keyof T)[] : null
-        })
+    async findOne(conditions: FindCondition<T>): Promise<T> {
+        return this.repository.findOne({ where: conditions })
     }
+
     /**
      * @param {FindConditions<T>} conditions 
      * @param {FindOneOptions<T>} options 
      * @returns Promise<T>
      */
-    async getOne(conditions?: FindConditions<T>, options?: FindOneOptions<T>): Promise<T> {
-        return this.repository.findOne(conditions, options)
+    async getOne(contidions: FindCondition<T>, fields?: string[]): Promise<T> {
+        const findOneoptions: FindOneOptions<T> = { where: contidions }
+
+        if (fields) {
+            findOneoptions.select = fields as (keyof T)[]
+        }
+
+        return this.repository.findOne(findOneoptions)
     }
 
     /**
@@ -105,26 +111,25 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
      * @param {FindConditions<T>} conditions 
      * @returns Promise<DeleteResult>
      */
-    async removeOne(conditions?: FindConditions<T>): Promise<DeleteResult> {
-        return await this.repository.delete(conditions)
+    async removeOne(criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindConditions<T>) {
+        return await this.repository.delete(criteria)
     }
 
     /**
      * @param {Record<string, unknown>} data 
      * @returns 
      */
-    save(data: any): Promise<T> {
+    async save(data: any): Promise<T> {
         return this.repository.save(data)
     }
 
     /**
-     * @param {EntityId} id 
+     * @param {number} id 
      * @param {any} data 
      * @returns 
      */
-    async update(id: EntityId, data: any): Promise<T> {
-        await this.repository.update(id, data)
-        return this.findById(id)
+    async update(id: number, data: any): Promise<UpdateResult> {
+        return this.repository.update(id, data)
     }
 
     /**
@@ -322,4 +327,3 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     }
 
 }
-
