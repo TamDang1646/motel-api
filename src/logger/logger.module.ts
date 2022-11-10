@@ -1,5 +1,3 @@
-import RedisComponent from "src/components/redis.component";
-
 import {
   Global,
   LogLevel,
@@ -10,8 +8,8 @@ import { LoggerService } from "./custom.logger";
 
 @Global()
 @Module({
-    providers: [LoggerService, RedisComponent],
-    exports: [LoggerService, RedisComponent],
+    providers: [LoggerService,],
+    exports: [LoggerService,],
 })
 export class LoggerModule {
     static LogLevel(level?: string): LogLevel[] {

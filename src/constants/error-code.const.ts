@@ -15,7 +15,7 @@ export const ErrorCodes = {
     RECORD_NOT_FOUND: 9104,
 
     // Role
-    FJOB_ROLE_NOT_SUPPORT: 1001,
+    ROLE_NOT_SUPPORT: 1001,
 
     // Validate
     VALIDATION_INPUT_TYPE_ERROR: 1004,

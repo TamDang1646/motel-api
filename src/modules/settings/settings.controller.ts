@@ -6,17 +6,17 @@ import { TokenDto } from "src/dtos/token.dto";
 import { DatabaseError } from "src/exceptions/errors/database.error";
 
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from "@nestjs/common";
 import {
-    ApiBearerAuth,
-    ApiTags,
+  ApiBearerAuth,
+  ApiTags,
 } from "@nestjs/swagger";
 
 import { CreateSettingDto } from "./dto/create-setting.dto";
@@ -54,8 +54,6 @@ export class SettingsController extends BaseController {
 
             result[sett.name] = sett.value
         })
-
-        console.log("Debug", await this.settingsService.getSettingViaCache<number>("DEFAULT_SEARCH_DISTANCE", 0));
 
         return {
             data: result

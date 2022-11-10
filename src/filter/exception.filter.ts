@@ -20,7 +20,6 @@ import {
 } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { ConfigService } from "@nestjs/config";
-import { SentryService } from "@ntegral/nestjs-sentry";
 import * as Sentry from "@sentry/node";
 import { Primitive } from "@sentry/types";
 
@@ -28,7 +27,7 @@ import { Primitive } from "@sentry/types";
 @Injectable()
 export class AllExceptionFilter implements ExceptionFilter {
     constructor(
-        private readonly sentryService: SentryService,
+        // private readonly sentryService: SentryService,
         private readonly configService: ConfigService,
     ) { }
 
@@ -224,10 +223,10 @@ export class AllExceptionFilter implements ExceptionFilter {
             errorCode !== 7200 &&
             errorCode !== 7201
         ) {
-            const sentry: typeof Sentry = this.sentryService.instance()
+            // const sentry: typeof Sentry = this.sentryService.instance()
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            this.handleInfoSentry(sentry, host.getArgs()[0] as Request, statusCode)
-            sentry.captureException(exception);
+            // this.handleInfoSentry(sentry, host.getArgs()[0] as Request, statusCode)
+            // sentry.captureException(exception);
         }
     }
 

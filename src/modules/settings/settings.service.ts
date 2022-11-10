@@ -1,6 +1,4 @@
 import { BaseService } from "src/base/base.service";
-import RedisComponent from "src/components/redis.component";
-import { DefaultSetting } from "src/constants/app-setting";
 import { Setting } from "src/entities/Setting";
 import { LoggerService } from "src/logger/custom.logger";
 import { FindConditions } from "typeorm";
@@ -12,12 +10,9 @@ import { SettingRepository } from "./setting-repository";
 
 @Injectable()
 export class SettingsService extends BaseService<Setting, SettingRepository> {
-    protected redis: RedisComponent
 
-    constructor(repository: SettingRepository, logger: LoggerService, redis: RedisComponent) {
+    constructor(repository: SettingRepository, logger: LoggerService,) {
         super(repository, logger)
-
-        this.redis = redis
     }
 
     create(createSettingDto: CreateSettingDto) {
@@ -68,25 +63,5 @@ export class SettingsService extends BaseService<Setting, SettingRepository> {
         return result.value
     }
 
-    /**
-     * @param {setting} name 
-     * @returns 
-     */
-    async getSettingViaCache<T>(name: string, defaultValue: null | string | number | object = null): Promise<T | null> {
-        let value = await this.redis.get(name)
 
-        if (!value) {
-            const val = await this.getSetting(name, defaultValue)
-
-            if (val) {
-                await this.redis.set(name, val as string | Buffer | number, DefaultSetting.DEFAULT_CACHE_SETTING)
-
-                return val as unknown as T
-            }
-
-            return null
-        }
-
-        return value as unknown as T
-    }
 }
