@@ -1,7 +1,7 @@
 version: "2"
 services:
-    fjob-main:
-        container_name: fjob_main
+    motel-main:
+        container_name: motel_main
         environment:
             - NODE_ENV=development        
         command: yarn test

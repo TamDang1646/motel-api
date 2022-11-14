@@ -1,8 +1,6 @@
 
 ## Description
 
-[Fjob](https://github.com/zetajsc/fjob-api) Tìm việc làm thêm nhanh nhất.
-
 ## Installation
 
 ```bash

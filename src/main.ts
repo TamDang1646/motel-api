@@ -1,16 +1,16 @@
 import { LogLevel } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
-    NestFactory,
-    Reflector,
+  NestFactory,
+  Reflector,
 } from "@nestjs/core";
 import {
-    FastifyAdapter,
-    NestFastifyApplication,
+  FastifyAdapter,
+  NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import {
-    DocumentBuilder,
-    SwaggerModule,
+  DocumentBuilder,
+  SwaggerModule,
 } from "@nestjs/swagger";
 
 import { AppModule } from "./app.module";
@@ -21,7 +21,7 @@ import { useRequestLogging } from "./middleware/request-logging";
 import { isEnv } from "./utils/general.util";
 import { RolesGuard } from "./validators/roles.guard";
 import {
-    ValidationPipe422,
+  ValidationPipe422,
 } from "./validators/validation-pipe-tranform.validate";
 
 async function bootstrap() {
@@ -60,11 +60,10 @@ async function bootstrap() {
         app.enableCors();
 
         const config = new DocumentBuilder()
-            .setTitle("FJob API")
-            .setDescription("Tìm việc làm thêm nhanh nhất")
+            .setTitle("Motel API")
+            .setDescription("Tìm nhà trọ nhanh chóng")
             .setVersion("1.0")
-            .addBearerAuth()
-            .addServer("https://api.dev.fjob.com.vn/main/v1.0")
+            // .addBearerAuth()
             .addServer(`http://localhost:${port}`)
             .build();
 

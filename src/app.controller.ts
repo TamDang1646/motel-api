@@ -24,56 +24,10 @@ import { RolesGuard } from "./validators/roles.guard";
 export class AppController {
     constructor(
         private readonly appService: AppService,
-        // private readonly amqpConnection: AmqpConnection,
-        // @InjectQueue("audio") private audioQueue: Queue,
-        // private fjobItemService: FjobItemService,
-        // private i18n: MessageComponent
     ) { }
 
     @Get("profile")
     async getHello(@Req() request: Request): Promise<string> {
-        // await this.walletService.addMoney(11, 1, 10)
-        // await this.walletService.subMoney(11, 100)
-        // const { rLat, rLon } = getRateLatLon(new Point({ latitude: 52.528611, longitude: 13.408056 }), 5000)
-
-        // let ar = findARound(new Point({ latitude: 21.014399077613056, longitude: 105.83696591213305 }), 500)
-
-        // const dis = getDistance(
-        //     { latitude: 21.014399077613056, longitude: 105.8369659121330 },
-        //     { latitude: 21.005415924771864, longitude: 105.82734272428753 }, 1
-        // );
-
-        // const dis1 = getDistance(
-        //     { latitude: 21.014399077613056, longitude: 105.8369659121330 },
-        //     { latitude: 21.023382230454256, longitude: 105.84658909997859 }, 1
-        // );
-
-        // console.log("Debug", dis, dis1, rLat, rLon, ar)
-        // try {
-        //     throw new ValidateError("khuy7en", "ly do day", 1100)
-        // } catch (e) {
-        //     if (e instanceof ValidateError) {
-        //         throw new BadRequestException(
-        //             {
-        //                 message: e.getMessage(),
-        //                 cause: e.getCause() || "",
-        //                 errorCode: e.getErrorCode() || 9000
-        //             }
-        //         )
-        //     }
-
-        // }
-
-        // console.log("Debug", a)
-        // void await this.amqpConnection.publish("exchange2", "subscribe-route1", { msg: "hello world" });
-        // void await this.amqpConnection.publish("exchange3", "subscribe-route2", { msg: "hello world 1" });
-
-        // console.log("Debug", this.i18n.lang("ID_NOT_EXIST", "en"));
-
-        // void await this.audioQueue.add({
-        //     foo: "bar",
-        // });
-
         console.log(startTimeOfDay())
         console.log(startTimeOfDay(false))
 
@@ -105,8 +59,6 @@ export class AppController {
             new Shift({ timeFrom: 10.5, timeTo: 14.3 })
         ])
         console.log("Debug", a, bitCount(a));
-        // let test = await this.fjobItemService.pickAGiftFromStock("CGV")
-        // console.log("Debug", test);
         return { message: "Request Succeed!" };
     }
 

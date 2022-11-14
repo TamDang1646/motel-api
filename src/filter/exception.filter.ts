@@ -197,16 +197,16 @@ export class AllExceptionFilter implements ExceptionFilter {
                 sentry.setTag("x-request-id", JSON.stringify(request.headers["x-request-id"]))
             }
 
-            if (request.headers["x-fjob-role"]) {
-                sentry.setTag("x-fjob-role", JSON.stringify(request.headers["x-fjob-role"]))
+            if (request.headers["x-role"]) {
+                sentry.setTag("x-role", JSON.stringify(request.headers["x-role"]))
             }
 
-            if (request.headers["x-fjob-code"]) {
-                sentry.setTag("x-fjob-code", JSON.stringify(request.headers["x-fjob-code"]))
+            if (request.headers["x-code"]) {
+                sentry.setTag("x-code", JSON.stringify(request.headers["x-code"]))
             }
 
-            if (request.headers["x-fjob-id"]) {
-                sentry.setTag("x-fjob-id", JSON.stringify(request.headers["x-fjob-id"]))
+            if (request.headers["x-id"]) {
+                sentry.setTag("x-id", JSON.stringify(request.headers["x-id"]))
             }
         }
     }

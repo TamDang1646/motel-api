@@ -11,11 +11,11 @@ export const Token = createParamDecorator(
         const headers = request.headers as unknown as Record<string, unknown>
 
         return new TokenDto({
-            userId: headers["x-fjob-user-id"] ? parseInt(headers["x-fjob-user-id"] as string) : 0,
-            userCode: headers["x-fjob-user-code"] ?? "",
-            role: headers["x-fjob-role"] ?? "",
-            lang: headers["x-fjob-lang"] ?? "vi",
-            apiKey: headers["x-fjob-pai-key"] ?? "",
+            userId: headers["x-user-id"] ? parseInt(headers["x-user-id"] as string) : 0,
+            userCode: headers["x-user-code"] ?? "",
+            role: headers["x-role"] ?? "",
+            lang: headers["x-lang"] ?? "vi",
+            apiKey: headers["x-pai-key"] ?? "",
         });
     },
 );

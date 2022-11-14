@@ -52,13 +52,13 @@ export class createSettingTable1630425841379 implements MigrationInterface {
             }), true
         );
 
-        await queryRunner.createIndices("fjob_setting", [
-            new TableIndex({ name: "ix_fjob_setting_name", columnNames: ["name"] }),
+        await queryRunner.createIndices("setting", [
+            new TableIndex({ name: "ix_setting_name", columnNames: ["name"] }),
         ]);
     }
 
     async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("fjob_setting");
+        await queryRunner.dropTable("setting");
     }
 
 }

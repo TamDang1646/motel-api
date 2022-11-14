@@ -34,7 +34,7 @@ export class SettingsService extends BaseService<Setting, SettingRepository> {
     }
 
     /**
-     * @param {FjobSetting} model 
+     * @param {Setting} model 
      * @returns 
      */
     getSettingByObject(model: Setting): { name: string, value: string | number | object } {
