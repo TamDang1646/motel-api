@@ -22,9 +22,6 @@ export class GetUserDto extends BaseDto<User> {
     gender: number
 
     @Property()
-    academicId: number
-
-    @Property()
     language: string
 
     @Property()
@@ -34,26 +31,9 @@ export class GetUserDto extends BaseDto<User> {
     avatar: string
 
     @Property()
-    companyId: number
+    address: string
 
     @Property()
-    shortAddress: string
-
-    @Property()
-    isEmployee: number
-
-    @Property()
-    isEmployer: number
-
-    @Property()
-    isPersonal: number
-
-    @Property()
-    points: number
-
-    @Property()
-    favCats?: number[]
-
-    @Property()
-    experience?: number[]
+    totalPost: number
+    
 }
