@@ -56,7 +56,8 @@
         "lodash": "^4.17.21",
         "moment": "^2.29.3",
         "morgan": "^1.10.0",
-        "mysql": "^2.18.1",
+        "mysql2": "^2.3.3",
+        "sqlite3": "^5.1.2",
         "nestjs-typeorm-paginate": "^4.0.1",
         "node-fetch": "^3.2.4",
         "npx": "^10.2.2",
@@ -65,7 +66,7 @@
         "query-string": "^7.1.1",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.5.5",
-        "typeorm": "^0.2.45",
+        "typeorm": "^0.3.10",
         "typeorm-adapter": "^1.4.2",
         "typeorm-model-generator": "^0.4.6",
         "uuid": "^8.3.2"

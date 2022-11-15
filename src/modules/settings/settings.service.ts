@@ -1,7 +1,7 @@
 import { BaseService } from "src/base/base.service";
 import { Setting } from "src/entities/Setting";
 import { LoggerService } from "src/logger/custom.logger";
-import { FindConditions } from "typeorm";
+import { FindOptionsWhere } from "typeorm";
 
 import { Injectable } from "@nestjs/common";
 
@@ -27,7 +27,7 @@ export class SettingsService extends BaseService<Setting, SettingRepository> {
      * @param {EntityId} id 
      * @param {any} data 
      */
-    async updateSetting(conditions: FindConditions<Setting>, data: any): Promise<number> {
+    async updateSetting(conditions: FindOptionsWhere<Setting>, data: any): Promise<number> {
         const update = await this.repository.update(conditions, data)
 
         return update.affected
