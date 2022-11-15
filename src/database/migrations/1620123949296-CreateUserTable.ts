@@ -19,6 +19,13 @@ export class CreateUserTable1620123949296 implements MigrationInterface {
                         generationStrategy: "increment"
                     },
                     {
+                        name: "user_id",
+                        type: "int",
+                        length: "11",
+                        isPrimary: true,
+                        isUnique: true
+                    },
+                    {
                         name: "code",
                         type: "varchar",
                         length: "12",
@@ -82,11 +89,10 @@ export class CreateUserTable1620123949296 implements MigrationInterface {
                     },
                     {
                         name: "total_post",
-                        type: "longint",
+                        type: "int",
                         isNullable: true,
-                        default: 0,
+                        default: "0",
                     },
-                    
                     {
                         name: "created_at",
                         type: "timestamp",

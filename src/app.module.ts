@@ -13,6 +13,7 @@ import databaseConfig from "./configs/database.config";
 import { DatabaseModule } from "./database/database.module";
 import { AllExceptionFilter } from "./filter/exception.filter";
 import { LoggerModule } from "./logger/logger.module";
+import { AuthModule } from "./modules/auth/auth.module";
 import { SettingsModule } from "./modules/settings/settings.module";
 import { UserModule } from "./modules/user/user.module";
 
@@ -23,9 +24,10 @@ import { UserModule } from "./modules/user/user.module";
             load: [appConfig, databaseConfig],
         }),
         LoggerModule,
+        SettingsModule,
+        AuthModule,
         UserModule,
         DatabaseModule,
-        SettingsModule,
     ],
     controllers: [AppController],
     providers: [
