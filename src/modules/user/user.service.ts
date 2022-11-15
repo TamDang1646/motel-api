@@ -74,7 +74,6 @@ export class UserService extends BaseService<User, UserRepository> {
      * @returns Promise<User>
      */
     async createUser(userData: CreateUserDto): Promise<User> {
-        userData.isPersonal = userData.isPersonal ?? 1
 
         const isDuplicated = await this.repository.findOne(
             {
