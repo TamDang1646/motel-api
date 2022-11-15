@@ -9,9 +9,10 @@ import { throwNotFound } from "src/utils/throw-exception.util";
 import {
   BaseEntity,
   DeleteResult,
+  FindCondition,
+  FindConditions,
   FindManyOptions,
   FindOneOptions,
-  FindOptionsWhere,
   ObjectID,
   Repository,
   SelectQueryBuilder,
@@ -56,9 +57,9 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
      * @param {EntityId} id 
      * @returns Promise<T>
      */
-    // findById(id?: string | number): Promise<T> {
-    //     return this.repository.findOne({ id:id })
-    // }
+    findById(id?: string | number): Promise<T> {
+        return this.repository.findOne(id)
+    }
 
     /**
      * @param {number[]} ids 
@@ -79,16 +80,16 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     /**
      * @returns Promise<T>
      */
-    async findOne(conditions: FindOptionsWhere<T>): Promise<T> {
+    async findOne(conditions: FindCondition<T>): Promise<T> {
         return this.repository.findOne({ where: conditions })
     }
 
     /**
-     * @param {FindOptionsWhere<T>} conditions 
+     * @param {FindConditions<T>} conditions 
      * @param {FindOneOptions<T>} options 
      * @returns Promise<T>
      */
-    async getOne(contidions: FindOptionsWhere<T>, fields?: string[]): Promise<T> {
+    async getOne(contidions: FindCondition<T>, fields?: string[]): Promise<T> {
         const findOneoptions: FindOneOptions<T> = { where: contidions }
 
         if (fields) {
@@ -107,10 +108,10 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
     }
 
     /**
-     * @param {FindOptionsWhere<T>} conditions 
+     * @param {FindConditions<T>} conditions 
      * @returns Promise<DeleteResult>
      */
-    async removeOne(criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindOptionsWhere<T>) {
+    async removeOne(criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindConditions<T>) {
         return await this.repository.delete(criteria)
     }
 

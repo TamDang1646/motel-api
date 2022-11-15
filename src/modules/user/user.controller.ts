@@ -4,7 +4,6 @@ import { MessageComponent } from "src/components/message.component";
 import {
   Controller,
   Get,
-  Post,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
@@ -29,11 +28,5 @@ export class UserController extends BaseController {
     @Get("/test")
     async test(): Promise<string> {
         return "test"
-    }
-
-
-    @Post("/login")
-    async login(): Promise<any> {
-        
     }
 }
