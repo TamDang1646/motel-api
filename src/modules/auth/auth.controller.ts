@@ -66,8 +66,11 @@ export class AuthController extends BaseController {
                 newData.userId = res.id
                 newData.code = res.code
                 newData.phoneNumber = res.phoneNumber
+                const res2 = await this.userService.createUser(newData)
+                return res2 
+            } else {
+                this.authService.delete(res.id)
             }
-            return use 
         } catch (err) {
             // since we have errors let's rollback changes we made
             
