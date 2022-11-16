@@ -1,5 +1,8 @@
 import { BaseController } from "src/base/base.controller";
 import { MessageComponent } from "src/components/message.component";
+import { ErrorCodes } from "src/constants/error-code.const";
+import { Auth } from "src/entities/Auth.entity";
+import { InvalidValueError } from "src/exceptions/errors/invalid-value.error";
 import { telephoneCheckAndGet } from "src/utils/general.util";
 import { generateId } from "src/utils/id-generator.util";
 import { DataSource } from "typeorm";
@@ -35,9 +38,13 @@ export class AuthController extends BaseController {
         super(i18n);
     }
 
-    @Get("/test")
-    async test(): Promise<string> {
-        return "test"
+    @Get("/all")
+    async test(): Promise<Auth[]> {
+        try {
+            return await this.authService.getAll()
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
     }
 
 
@@ -45,35 +52,52 @@ export class AuthController extends BaseController {
     async register(
         @Body() createAuthBody: CreateAuthDto
     ): Promise<any> {
-        let data
+        let data = new Auth()
+        let authRes
+        let userRes
         let code = ""
         const phoneNumber = telephoneCheckAndGet(createAuthBody.phoneNumber)
-        console.log("data",phoneNumber);
-        data = {}
+        if (!phoneNumber) {
+            throw new InvalidValueError(
+                "INVALID_PHONE_NUMBER",
+                "Invalid user phone",
+                ErrorCodes.INVALID_PHONE_NUMBER)
+        }
+        if (createAuthBody.password != createAuthBody.rePassword) {
+            throw new InvalidValueError(
+                "PASSWORD_INCORRECT",
+                "PASSWORD_INCORRECT",
+                ErrorCodes.PASSWORD_INCORRECT)
+        }
         const userTypeId = 1
         const shard = 511
         const sequenceId = Math.floor(Math.random() * 1024)
         code = generateId(userTypeId, Date.now(), shard, sequenceId)
         try {
-            let use
             data.code = code
             data.phoneNumber = phoneNumber
             data.password = createAuthBody.rePassword
-            const res = await this.authService.save(data)
-            console.log("res",res);
-            if (res) {
-                let newData: CreateUserDto
-                newData.userId = res.id
-                newData.code = res.code
-                newData.phoneNumber = res.phoneNumber
-                const res2 = await this.userService.createUser(newData)
-                return res2 
-            } else {
-                this.authService.delete(res.id)
-            }
+            authRes = await this.authService.createUser(data)
         } catch (err) {
             // since we have errors let's rollback changes we made
-            
+            this.throwErrorProcess(err)
+            return
+        }
+        try {
+            const auth = await this.authService.getAuth(authRes.id)
+            let newData = new CreateUserDto()
+            newData.id = auth.id
+            newData.code = auth.code
+            newData.phoneNumber = auth.phoneNumber
+            console.log("newData",newData);
+            userRes = await this.userService.createUser(newData)
+            console.log("userRes",userRes);
+            return userRes 
+        } catch (error) {
+            this.authService.delete(authRes.id)
+            this.userService.delete(userRes.id)
+            this.throwErrorProcess(error)
+            return
         }
     }
 }

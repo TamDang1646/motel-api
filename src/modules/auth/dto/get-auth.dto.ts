@@ -5,8 +5,24 @@ import { Property } from "src/utils/general.util";
 
 import { ApiProperty } from "@nestjs/swagger";
 
-export class CreateAuthDto extends BaseDto<Auth> {
+export class GetAuthDto extends BaseDto<Auth> {
  
+      @ApiProperty({
+          description: "User's id"
+      })
+      // @IsString()
+      @Property()
+      @IsString()
+      id: number
+    
+      @ApiProperty({
+          description: "User's code"
+      })
+      // @IsString()
+      @Property()
+      @IsString()
+      code: string
+    
       @ApiProperty({
           description: "User's phone number"
       })
@@ -14,21 +30,14 @@ export class CreateAuthDto extends BaseDto<Auth> {
       @Property()
       @IsString()
       phoneNumber: string
-  
+    
       @ApiProperty({
-          required: true,
-          description: "User's password"
+          description: "User's language"
       })
+      // @IsString()
       @Property()
       @IsString()
-      password: string
-
-      @ApiProperty({
-          required: true,
-          description: "User's re-password"
-      })
-      @Property()
-      @IsString()
-      rePassword: string
+      language: string
+    
   }
   

@@ -1,6 +1,5 @@
 import { MessageComponent } from "src/components/message.component";
 import { ErrorCodes } from "src/constants/error-code.const";
-import { TokenDto } from "src/dtos/token.dto";
 import { BaseError } from "src/exceptions/errors/base.error";
 import { DatabaseError } from "src/exceptions/errors/database.error";
 import {
@@ -20,30 +19,30 @@ export class BaseController {
         this.l = i18n
     }
 
-    protected throwErrorProcess(error: any, token: TokenDto) {
+    protected throwErrorProcess(error: any) {
         console.log("Debug", error)
         if (error instanceof BaseError) {
             throw new BadRequestException({
-                message: this.l.lang(error.getMessage(), token.lang),
+                message: this.l.lang(error.getMessage(), "vi"),
                 cause: error.getCause(),
                 errorCode: error.getErrorCode()
             })
         } else if (error instanceof TypeError) {
             throw throwValidate(
-                this.l.lang("UNKNOWN_ERROR", token.lang),
+                this.l.lang("UNKNOWN_ERROR", "vi"),
                 { errorContent: { message: error.message, stack: error.stack } },
                 ErrorCodes.SYNTAXERROR
             )
         } else if (error instanceof QueryFailedError) {
             throwDatabase(
-                this.l.lang("UNKNOWN_ERROR", token.lang),
+                this.l.lang("UNKNOWN_ERROR", "vi"),
                 JSON.stringify(error),
                 ErrorCodes.UNKNOWN
             )
         }
 
         throw new DatabaseError(
-            this.l.lang("UNKNOWN_ERROR", token.lang),
+            this.l.lang("UNKNOWN_ERROR", "vi"),
             { errorContent: error },
             ErrorCodes.UNKNOWN
         )

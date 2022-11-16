@@ -1,5 +1,5 @@
 import { BaseDto } from "src/base/base.dto";
-import { User } from "src/entities/User";
+import { User } from "src/entities/User.entity";
 import { Property } from "src/utils/general.util";
 
 export class GetUserDto extends BaseDto<User> {
@@ -35,5 +35,4 @@ export class GetUserDto extends BaseDto<User> {
 
     @Property()
     totalPost: number
-    
 }

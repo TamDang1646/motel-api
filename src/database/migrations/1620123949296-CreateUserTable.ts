@@ -10,13 +10,19 @@ export class CreateUserTable1620123949296 implements MigrationInterface {
             new Table({
                 name: "user",
                 columns: [
+                    // {
+                    //     name: "id",
+                    //     type: "int",
+                    //     length: "11",
+                    //     isPrimary: true,
+                    //     isGenerated: true,
+                    //     generationStrategy: "increment"
+                    // },
                     {
                         name: "id",
                         type: "int",
                         length: "11",
                         isPrimary: true,
-                        isGenerated: true,
-                        generationStrategy: "increment"
                     },
                     {
                         name: "code",
@@ -35,19 +41,19 @@ export class CreateUserTable1620123949296 implements MigrationInterface {
                         type: "varchar",
                         length: "100",
                         isNullable: true,
-                        default: "''",
                     },
                     {
                         name: "name",
                         type: "varchar",
                         length: "100",
                         isNullable: true,
-                        default: "''",
+                        default: "'New User'",
                     },
                     {
                         name: "gender",
                         type: "tinyint",
                         isNullable: true,
+                        default: 0,
                         comment: "0: male | 1: female | 2: other",
                     },
                     {
@@ -72,17 +78,15 @@ export class CreateUserTable1620123949296 implements MigrationInterface {
                         name: "avatar",
                         type: "varchar",
                         isNullable: true,
-                        default: "''",
                     },
                     {
                         name: "address",
                         type: "varchar",
                         isNullable: true,
-                        default: "''",
                     },
                     {
                         name: "total_post",
-                        type: "longint",
+                        type: "int",
                         isNullable: true,
                         default: 0,
                     },

@@ -1,53 +1,87 @@
 import { BaseService } from "src/base/base.service";
-import { Auth } from "src/entities/Auth";
+import { ErrorCodes } from "src/constants/error-code.const";
+import { Auth } from "src/entities/Auth.entity";
+import { User } from "src/entities/User.entity";
+import { DatabaseError } from "src/exceptions/errors/database.error";
 import { LoggerService } from "src/logger/custom.logger";
-import { DataSource } from "typeorm";
+import {
+  InsertResult,
+  QueryFailedError,
+} from "typeorm";
 
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { UserRepository } from "../user/user.repository";
 import { AuthRepository } from "./auth.repository";
 
 @Injectable()
 export class AuthServices extends BaseService<Auth, AuthRepository> {
     constructor(
         @InjectRepository(Auth)
-        protected readonly repo: AuthRepository,
-        protected readonly userRepo: UserRepository,
+        protected readonly repository: AuthRepository,
         protected readonly logger: LoggerService,
-        protected readonly dataSource: DataSource,
     ) {
-        super(repo, logger)
+        super(repository, logger)
     }
-    async createUser(params: any) {
-        let data = { ...params };
-
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.query("SELECT * FROM user")
-        await queryRunner.startTransaction()
-        try {
-            console.log("dataSer", data);
-            const res = await queryRunner.getTable("auth")
-            // const res = await this.repo.save(data);
-            console.log("res", res);
+    async createUser(authData: any) {
+        console.log("authData",authData);
+        
+        const isDuplicated = await this.repository.findOne(
+            {
+                where: [
+                    { phoneNumber: authData.phoneNumber},
+                ]
+            }
+        )
+            console.log("isDuplicated",isDuplicated);
             
-            // const res2 = await this.userRepo.save(data)
-            // console.log("res2",res2);
-            
-            const response = await queryRunner.manager.save(data)     
-            console.log("response",response);
-                // commit transaction now:
-            await queryRunner.commitTransaction()
-            return 
-            // execute some operations on this transaction:
-        } catch (err) {
-            // since we have errors let's rollback changes we made
-            await queryRunner.rollbackTransaction()
-        } finally {
-            // you need to release query runner which is manually created:
-            await queryRunner.release()
+        if (isDuplicated) {
+            throw new DatabaseError(
+                    "USER_PHONE_NUMBER_ALREADY_EXISTS",
+                    "Duplicated Phone Number",
+                    ErrorCodes.USER_PHONE_NUMBER_ALREADY_EXISTS)
         }
+
+        let result: InsertResult
+        try {
+            result = await this.repository.createQueryBuilder()
+                .insert()
+                .values(authData)
+                .execute()
+        } catch (error: unknown) {
+            if (error instanceof QueryFailedError) {
+                throw new DatabaseError("INSERT_ERROR",
+                    error as unknown as Record<string, unknown>,
+                    ErrorCodes.INSERT_ERROR)
+            }
+
+
+            throw new DatabaseError("DATABASE_CONNECTION_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.DATABASE_CONNECTION_ERROR)
+        }
+        console.log("result",result);
+        
+        return new User(result.generatedMaps[0])
+    }
+
+    async getAuth(id: any) {
+        return await this.repository.findOne(
+            {
+                where: [
+                    { id: id },
+                ]
+            }
+        )
+    }
+
+    async getAll(): Promise<Auth[]> {
+        // const query = this.repository.manager.createQueryBuilder<Auth>(Auth, "auth")
+        //     .select("*")
+        // console.log("query",query.getQuery(),await query.getMany());
+        
+        // return await query.getMany()
+        return await this.repository.find()
+            
     }
 }     

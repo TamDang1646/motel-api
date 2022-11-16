@@ -1,12 +1,11 @@
 import { ApiResponseService } from "src/api-response/api-response.service";
 import { MessageComponent } from "src/components/message.component";
-import { Auth } from "src/entities/Auth";
-import { User } from "src/entities/User";
+import { Auth } from "src/entities/Auth.entity";
+import { User } from "src/entities/User.entity";
 
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { UserRepository } from "../user/user.repository";
 import { UserService } from "../user/user.service";
 import { AuthController } from "./auth.controller";
 import { AuthServices } from "./auth.service";
@@ -16,7 +15,7 @@ import { AuthServices } from "./auth.service";
         TypeOrmModule.forFeature([Auth, User]),
         
     ],
-    providers: [AuthServices, MessageComponent, ApiResponseService,UserService,UserRepository],
+    providers: [AuthServices, MessageComponent, ApiResponseService,UserService],
     exports: [TypeOrmModule, AuthServices,AuthServices],
     controllers: [AuthController],
 })

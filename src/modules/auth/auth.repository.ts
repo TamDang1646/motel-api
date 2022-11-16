@@ -1,4 +1,4 @@
-import { Auth } from "src/entities/Auth";
+import { Auth } from "src/entities/Auth.entity";
 import {
   EntityRepository,
   Repository,

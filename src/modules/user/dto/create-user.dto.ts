@@ -4,7 +4,7 @@ import {
   IsString,
 } from "class-validator";
 import { BaseDto } from "src/base/base.dto";
-import { User } from "src/entities/User";
+import { User } from "src/entities/User.entity";
 import { Property } from "src/utils/general.util";
 
 import { ApiProperty } from "@nestjs/swagger";
@@ -16,7 +16,7 @@ export class CreateUserDto extends BaseDto<User> {
     })
     @IsNumber()
     @Property()
-    userId: number
+    id: number
 
     @ApiProperty({
         default: "dnYUBEand",

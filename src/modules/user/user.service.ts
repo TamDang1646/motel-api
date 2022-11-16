@@ -1,10 +1,9 @@
 import { BaseService } from "src/base/base.service";
 import { PaginationDto } from "src/base/pagination.dto";
 import { ErrorCodes } from "src/constants/error-code.const";
-import { User } from "src/entities/User";
+import { User } from "src/entities/User.entity";
 import { DatabaseError } from "src/exceptions/errors/database.error";
 import { LoggerService } from "src/logger/custom.logger";
-import { CreateUserDto } from "src/modules/user/dto/create-user.dto";
 import {
   DeleteResult,
   InsertResult,
@@ -12,20 +11,26 @@ import {
 } from "typeorm";
 
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
 
+import { CreateUserDto } from "./dto/create-user.dto";
 import { GetUserDto } from "./dto/get-user.dto";
 import { UserRepository } from "./user.repository";
 
 @Injectable()
 export class UserService extends BaseService<User, UserRepository> {
     constructor(
-        private readonly configService: ConfigService,
-        repository: UserRepository,
-        logger: LoggerService
+        @InjectRepository(User)
+        protected readonly repository: UserRepository,
+        protected readonly logger: LoggerService,
     ) {
         super(repository, logger)
     }
+
+    async getAll(): Promise<User[]> {
+        return await this.repository.find()
+    }
+
 
     /**
      * @param {string} code
@@ -34,7 +39,7 @@ export class UserService extends BaseService<User, UserRepository> {
      *
      * @returns Promise<GetUserDto | User>
      */
-    async getUser(
+     async getUser(
         code: string,
         getFullInfo: boolean = false,
         fields?: string[]
@@ -103,7 +108,10 @@ export class UserService extends BaseService<User, UserRepository> {
                 .insert()
                 .values(userData)
                 .execute()
+            console.log("result",new User(result.generatedMaps[0]));
+            
         } catch (error: unknown) {
+            console.log("error", error);
             if (error instanceof QueryFailedError) {
                 throw new DatabaseError("INSERT_ERROR",
                     error as unknown as Record<string, unknown>,
@@ -114,6 +122,7 @@ export class UserService extends BaseService<User, UserRepository> {
             throw new DatabaseError("DATABASE_CONNECTION_ERROR",
                 error as Record<string, unknown>,
                 ErrorCodes.DATABASE_CONNECTION_ERROR)
+            
         }
 
         return new User(result.generatedMaps[0])

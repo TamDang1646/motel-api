@@ -1,5 +1,6 @@
 import { BaseController } from "src/base/base.controller";
 import { MessageComponent } from "src/components/message.component";
+import { User } from "src/entities/User.entity";
 
 import {
   Controller,
@@ -15,18 +16,22 @@ import { UserService } from "./user.service";
 
 @ApiBearerAuth()
 @ApiTags('Users')
-@Controller("users")
+@Controller("user")
 export class UserController extends BaseController {
     constructor(
-        private readonly configService: ConfigService,
         private readonly userService: UserService,
+        private readonly configService: ConfigService,
         private i18n: MessageComponent,
     ) {
         super(i18n);
     }
 
-    @Get("/test")
-    async test(): Promise<string> {
-        return "test"
+    @Get("/all")
+    async getAll(): Promise<User[]> {
+        try {
+            return await this.userService.getAll()
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
     }
 }
