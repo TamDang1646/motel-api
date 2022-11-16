@@ -89,9 +89,7 @@ export class AuthController extends BaseController {
             newData.id = auth.id
             newData.code = auth.code
             newData.phoneNumber = auth.phoneNumber
-            console.log("newData",newData);
             userRes = await this.userService.createUser(newData)
-            console.log("userRes",userRes);
             return userRes 
         } catch (error) {
             this.authService.delete(authRes.id)

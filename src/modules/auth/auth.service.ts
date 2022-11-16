@@ -23,18 +23,14 @@ export class AuthServices extends BaseService<Auth, AuthRepository> {
     ) {
         super(repository, logger)
     }
-    async createUser(authData: any) {
-        console.log("authData",authData);
-        
+    async createUser(authData: any) {       
         const isDuplicated = await this.repository.findOne(
             {
                 where: [
                     { phoneNumber: authData.phoneNumber},
                 ]
             }
-        )
-            console.log("isDuplicated",isDuplicated);
-            
+        )            
         if (isDuplicated) {
             throw new DatabaseError(
                     "USER_PHONE_NUMBER_ALREADY_EXISTS",
@@ -59,9 +55,7 @@ export class AuthServices extends BaseService<Auth, AuthRepository> {
             throw new DatabaseError("DATABASE_CONNECTION_ERROR",
                 error as Record<string, unknown>,
                 ErrorCodes.DATABASE_CONNECTION_ERROR)
-        }
-        console.log("result",result);
-        
+        }       
         return new User(result.generatedMaps[0])
     }
 
