@@ -12,7 +12,6 @@ export class GetAuthDto extends BaseDto<Auth> {
       })
       // @IsString()
       @Property()
-      @IsString()
       id: number
     
       @ApiProperty({

@@ -1,4 +1,5 @@
 import { ApiResponseService } from "src/api-response/api-response.service";
+import ComponentService from "src/components/component";
 import { MessageComponent } from "src/components/message.component";
 import { Auth } from "src/entities/Auth.entity";
 import { User } from "src/entities/User.entity";
@@ -15,7 +16,7 @@ import { AuthServices } from "./auth.service";
         TypeOrmModule.forFeature([Auth, User]),
         
     ],
-    providers: [AuthServices, MessageComponent, ApiResponseService,UserService],
+    providers: [AuthServices, MessageComponent, ApiResponseService,UserService,ComponentService],
     exports: [TypeOrmModule, AuthServices,AuthServices],
     controllers: [AuthController],
 })

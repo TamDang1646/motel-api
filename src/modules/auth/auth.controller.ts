@@ -1,7 +1,9 @@
 import { BaseController } from "src/base/base.controller";
+import ComponentService from "src/components/component";
 import { MessageComponent } from "src/components/message.component";
 import { ErrorCodes } from "src/constants/error-code.const";
 import { Auth } from "src/entities/Auth.entity";
+import { User } from "src/entities/User.entity";
 import { InvalidValueError } from "src/exceptions/errors/invalid-value.error";
 import { telephoneCheckAndGet } from "src/utils/general.util";
 import { generateId } from "src/utils/id-generator.util";
@@ -11,6 +13,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -23,6 +26,8 @@ import { CreateUserDto } from "../user/dto/create-user.dto";
 import { UserService } from "../user/user.service";
 import { AuthServices } from "./auth.service";
 import { CreateAuthDto } from "./dto/create-auth.dto";
+import { LoginDto } from "./dto/login.dto";
+import { UpdateDto } from "./dto/update.dto";
 
 @ApiBearerAuth()
 @ApiTags('Auths')
@@ -33,11 +38,16 @@ export class AuthController extends BaseController {
         private readonly userService: UserService,
         private readonly configService: ConfigService,
         protected readonly dataSource: DataSource,
+        private readonly componentService: ComponentService,
         private i18n: MessageComponent,
     ) {
         super(i18n);
     }
 
+    /**
+     * 
+     * @returns 
+     */
     @Get("/all")
     async test(): Promise<Auth[]> {
         try {
@@ -48,6 +58,11 @@ export class AuthController extends BaseController {
     }
 
 
+    /**
+     * 
+     * @param createAuthBody 
+     * @returns 
+     */
     @Post("/register")
     async register(
         @Body() createAuthBody: CreateAuthDto
@@ -96,6 +111,86 @@ export class AuthController extends BaseController {
             this.userService.delete(userRes.id)
             this.throwErrorProcess(error)
             return
+        }
+    }
+
+    /**
+     * 
+     * @param loginParams 
+     * @returns 
+     */
+    @Post("/login")
+    async login(
+        @Body() loginParams: LoginDto
+    ): Promise<User>{
+        console.log("body: ", loginParams);
+        let phoneNumber = telephoneCheckAndGet(loginParams.phoneNumber)
+        if (!phoneNumber) {
+            throw new InvalidValueError(
+                "INVALID_PHONE_NUMBER",
+                "Invalid user phone",
+                ErrorCodes.INVALID_PHONE_NUMBER)
+        }
+        let authData
+        let userData
+        authData = await this.componentService.checkPhoneExist(phoneNumber)
+        if (authData && authData.password !== loginParams.password) { 
+            throw new InvalidValueError(
+                "PASSWORD_INCORRECT",
+                "PASSWORD_INCORRECT",
+                ErrorCodes.PASSWORD_INCORRECT)
+        }
+        if (authData) {
+            userData = await this.userService.getUser(authData.code, true)
+        } else { 
+            throw new InvalidValueError(
+                "USER_NOT_EXIST",
+                "USER_NOT_EXIST",
+                ErrorCodes.USER_NOT_EXIST)
+        }
+        if (!userData) {
+            throw new InvalidValueError(
+                "USER_NOT_EXIST",
+                "USER_NOT_EXIST",
+                ErrorCodes.USER_NOT_EXIST)
+        }
+        return userData
+    }
+
+
+    @Patch("/update")
+    async updateAuth(
+        @Body() updateParams: UpdateDto
+    ): Promise<any>{
+        let phoneNumber = telephoneCheckAndGet(updateParams.phoneNumber)
+        if (!phoneNumber) {
+            throw new InvalidValueError(
+                "INVALID_PHONE_NUMBER",
+                "Invalid user phone",
+                ErrorCodes.INVALID_PHONE_NUMBER)
+        }
+        let authData
+        let userData
+        authData = await this.componentService.checkPhoneExist(phoneNumber)
+        if (!authData) { 
+            throw new InvalidValueError(
+                "USER_NOT_EXIST",
+                "USER_NOT_EXIST",
+                ErrorCodes.USER_NOT_EXIST)
+        }
+        if (updateParams.newPassword != updateParams.rePassword) {
+            throw new InvalidValueError(
+                "NEW_PASSWORD_INCORRECT",
+                "PASSWORD_INCORRECT",
+                ErrorCodes.PASSWORD_INCORRECT)
+        }
+        try {
+            await this.authService.updateAuth(authData.id,{password:updateParams.newPassword})
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+        return {
+            message: "Update password success"
         }
     }
 }

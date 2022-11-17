@@ -23,6 +23,12 @@ export class AuthServices extends BaseService<Auth, AuthRepository> {
     ) {
         super(repository, logger)
     }
+
+    /**
+     * 
+     * @param authData 
+     * @returns 
+     */
     async createUser(authData: any) {       
         const isDuplicated = await this.repository.findOne(
             {
@@ -59,6 +65,12 @@ export class AuthServices extends BaseService<Auth, AuthRepository> {
         return new User(result.generatedMaps[0])
     }
 
+
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
     async getAuth(id: any) {
         return await this.repository.findOne(
             {
@@ -69,6 +81,11 @@ export class AuthServices extends BaseService<Auth, AuthRepository> {
         )
     }
 
+
+    /**
+     * 
+     * @returns 
+     */
     async getAll(): Promise<Auth[]> {
         // const query = this.repository.manager.createQueryBuilder<Auth>(Auth, "auth")
         //     .select("*")
@@ -78,4 +95,41 @@ export class AuthServices extends BaseService<Auth, AuthRepository> {
         return await this.repository.find()
             
     }
+
+
+    /**
+     * 
+     * @param phoneNumber 
+     * @returns 
+     */
+    async getAuthByPhone(phoneNumber: string): Promise<Auth> {
+        return await this.repository.findOne({
+            where: {
+                phoneNumber
+            }
+        })
+        
+    }
+
+
+    async updateAuth(id, data: unknown): Promise<any> {
+        try {
+            const result = await this.repository.update(id, data)
+            if (result.affected) {
+                return await this.repository.findOneBy({ id })
+            } else {
+                throw new DatabaseError(
+                    "UPDATE_ERROR",
+                    "authId không tồn tại",
+                    ErrorCodes.UPDATE_ERROR
+                )
+            }
+        } catch (error) {
+            throw new DatabaseError(
+                "UPDATE_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.UPDATE_ERROR
+            )
+        }
+     }
 }     
