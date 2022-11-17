@@ -1,5 +1,6 @@
 import { BaseService } from "src/base/base.service";
 import { PaginationDto } from "src/base/pagination.dto";
+import { DefaultSetting } from "src/constants/app-setting";
 import { ErrorCodes } from "src/constants/error-code.const";
 import { User } from "src/entities/User.entity";
 import { DatabaseError } from "src/exceptions/errors/database.error";
@@ -79,7 +80,7 @@ export class UserService extends BaseService<User, UserRepository> {
      * @returns Promise<User>
      */
     async createUser(userData: CreateUserDto): Promise<User> {
-
+        userData.avatar = DefaultSetting.DEFAULT_AVATAR
         const isDuplicated = await this.repository.findOne(
             {
                 where: [
