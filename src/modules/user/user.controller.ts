@@ -5,6 +5,7 @@ import { User } from "src/entities/User.entity";
 import {
   Controller,
   Get,
+  Param,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
@@ -30,6 +31,17 @@ export class UserController extends BaseController {
     async getAll(): Promise<User[]> {
         try {
             return await this.userService.getAll()
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
+
+    @Get("/:id")
+    async getUserById(
+        @Param("id") id: number
+    ): Promise<User> {
+        try {
+            return await this.userService.getUserById(id)
         } catch (error) {
             this.throwErrorProcess(error)
         }

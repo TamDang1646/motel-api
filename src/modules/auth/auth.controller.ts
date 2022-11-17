@@ -78,6 +78,12 @@ export class AuthController extends BaseController {
                 "Invalid user phone",
                 ErrorCodes.INVALID_PHONE_NUMBER)
         }
+        if (createAuthBody.password.trim().length < 8 || createAuthBody.rePassword.trim().length < 8) {
+            throw new InvalidValueError(
+                "Password must be longer than 8 characters",
+                "PASSWORD_INCORRECT",
+                ErrorCodes.PASSWORD_INCORRECT)
+        }
         if (createAuthBody.password != createAuthBody.rePassword) {
             throw new InvalidValueError(
                 "PASSWORD_INCORRECT",
@@ -105,7 +111,11 @@ export class AuthController extends BaseController {
             newData.code = auth.code
             newData.phoneNumber = auth.phoneNumber
             userRes = await this.userService.createUser(newData)
-            return userRes 
+            let user
+            if (userRes) {
+                user = await this.userService.getUserById(userRes.id)
+            }
+            return user 
         } catch (error) {
             this.authService.delete(authRes.id)
             this.userService.delete(userRes.id)

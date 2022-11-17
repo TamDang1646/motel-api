@@ -10,10 +10,10 @@ export class User extends BaseEntity {
     @Column("int", { primary: true, name: "id" })
     id: number;
 
-    @Column("varchar", { unique: true, name: "code", length: 12 })
+    @Column("varchar", {  name: "code", length: 12 })
     code: string;
 
-    @Column("varchar", { unique: true, name: "phone_number", length: 50 })
+    @Column("varchar", {  name: "phone_number", length: 50 })
     phoneNumber: string;
 
     @Column("varchar", {

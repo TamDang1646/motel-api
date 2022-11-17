@@ -107,11 +107,8 @@ export class UserService extends BaseService<User, UserRepository> {
             result = await this.repository.createQueryBuilder()
                 .insert()
                 .values(userData)
-                .execute()
-            console.log("result",new User(result.generatedMaps[0]));
-            
+                .execute()            
         } catch (error: unknown) {
-            console.log("error", error);
             if (error instanceof QueryFailedError) {
                 throw new DatabaseError("INSERT_ERROR",
                     error as unknown as Record<string, unknown>,
@@ -200,5 +197,21 @@ export class UserService extends BaseService<User, UserRepository> {
         userPagination.meta = rawPagination.meta
 
         return userPagination
+    }
+
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
+    async getUserById(id: number): Promise<User> {
+        const user = await this.repository.findOne(
+            {
+                where: [
+                    {id:id}
+                ]
+            }
+        )
+        return user
     }
 }
