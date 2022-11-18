@@ -8,15 +8,10 @@ import {
 } from "@nestjs/common";
 
 import { AppService } from "./app.service";
-import { Shift } from "./dtos/Shift.dto";
 import { BaseError } from "./exceptions/errors/base.error";
 import { DatabaseError } from "./exceptions/errors/database.error";
 import { ValidateError } from "./exceptions/errors/validate.error";
-import {
-  bitCount,
-  convertToBinary,
-  startTimeOfDay,
-} from "./utils/general.util";
+import { startTimeOfDay } from "./utils/general.util";
 import { RolesGuard } from "./validators/roles.guard";
 
 @Controller()
@@ -50,16 +45,6 @@ export class AppController {
         }
 
         return "test"
-    }
-
-    @Get("test")
-    async test(): Promise<unknown> {
-        const a = convertToBinary([
-            new Shift({ timeFrom: 1, timeTo: 10 }),
-            new Shift({ timeFrom: 10.5, timeTo: 14.3 })
-        ])
-        console.log("Debug", a, bitCount(a));
-        return { message: "Request Succeed!" };
     }
 
     @Get("healthz")

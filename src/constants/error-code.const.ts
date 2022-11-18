@@ -186,5 +186,9 @@ export const ErrorCodes = {
 
     //Store purchase
     STORE_PURCHASE_ERROR: 9100,
-    STORE_PURCHASE_INVALID_ITEM_ERROR: 9101
+    STORE_PURCHASE_INVALID_ITEM_ERROR: 9101,
+
+
+    // Password
+    PASSWORD_INCORRECT: 10001
 }

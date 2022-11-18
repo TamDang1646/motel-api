@@ -1,3 +1,5 @@
+import { connectionSource } from "ormconfig";
+
 import { LogLevel } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
@@ -49,6 +51,7 @@ async function bootstrap() {
     const configService = app.get(ConfigService);
     const port = String(configService.get("PORT") ?? 3000)
 
+    await connectionSource.initialize();
 
     // const meg = new MessageComponent()
 

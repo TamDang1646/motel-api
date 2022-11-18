@@ -1,6 +1,5 @@
 import { camelCase } from "change-case";
 import moment from "moment";
-import { Shift } from "src/dtos/Shift.dto";
 import { Env } from "src/enums/app.enum";
 
 export function Property(className = "fields", defaultValue: unknown = undefined): PropertyDecorator {
@@ -122,23 +121,6 @@ const mapBinary = new Map([
     [30, 0b100000000000000000000000000000],// 536870912
 ])
 
-export const convertToBinary = (shifts: Shift[]): number => {
-    if (!shifts || shifts.length === 0) {
-        return 0
-    }
-
-    let total = 0
-    shifts.forEach(shift => {
-        const from = Math.floor(shift.timeFrom)
-        const to = Math.ceil(shift.timeTo)
-
-        for (let i = from + 1; i <= to; i++) {
-            total = total | mapBinary.get(i)
-        }
-    })
-
-    return total
-}
 
 export const convertDaysToBinary = (days: number[]): number => {
     if (!days || days.length === 0) {

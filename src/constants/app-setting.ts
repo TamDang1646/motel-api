@@ -6,6 +6,7 @@ export const DefaultSetting = {
     DEFAULT_SEARCH_DISTANCE: 5000,//m
     MAX_OVERTIME_EXPIRED: 23,
     MAPPING_WORKING_TIME_PERCENT: 70,
+    DEFAULT_AVATAR: "https://i.pinimg.com/564x/d4/52/8c/d4528cf9df9468474fa54fd9919edf41.jpg",
 }
 
 export const SettingNames = {

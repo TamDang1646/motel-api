@@ -1,15 +1,23 @@
 import {
-  IsIn,
+  IsNumber,
   IsOptional,
   IsString,
 } from "class-validator";
 import { BaseDto } from "src/base/base.dto";
-import { User } from "src/entities/User";
+import { User } from "src/entities/User.entity";
 import { Property } from "src/utils/general.util";
 
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateUserDto extends BaseDto<User> {
+
+    @ApiProperty({
+        description: "User's id"
+    })
+    @IsNumber()
+    @Property()
+    id: number
+
     @ApiProperty({
         default: "dnYUBEand",
         description: "User's generated code"
@@ -19,11 +27,9 @@ export class CreateUserDto extends BaseDto<User> {
     code: string
 
     @ApiProperty({
-        default: null,
         description: "User's phone number"
     })
-    // @IsString()
-    @IsOptional()
+    @IsString()
     @Property()
     phoneNumber: string
 
@@ -37,46 +43,57 @@ export class CreateUserDto extends BaseDto<User> {
     email: string
 
     @ApiProperty({
-        default: 0,
-        description: "If user is an Employee"
+        default: "New User",
+        required: false,
+        description: "User's name"
     })
     @IsOptional()
-    @IsIn([0, 1, true, false])
     @Property()
-    isEmployee: number
+    name: string
 
     @ApiProperty({
-        default: 0,
-        description: "If user is an Employer"
+        default: "vi",
+        required: false,
+        description: "language"
     })
     @IsOptional()
-    @IsIn([0, 1, true, false])
     @Property()
-    isEmployer: number
-
-    @ApiProperty({
-        default: 1,
-        description: "If user is an independent Employer"
-    })
-    @IsOptional()
-    @IsIn([0, 1, true, false])
-    @Property()
-    isPersonal: number
-
+    language: string
+    
     @ApiProperty({
         default: 0,
-        description: "Is Social login"
+        required: false,
+        description: "User's name"
     })
     @IsOptional()
-    @IsIn([0, 1, true, false])
     @Property()
-    isFromSocial: number
+    gender: number
 
     @ApiProperty({
-        default: 0,
-        description: "Social id"
+        default: null,
+        required: false,
+        description: "User's birthday"
     })
     @IsOptional()
     @Property()
-    socialId: string
+    birthday: string
+
+    @ApiProperty({
+        default: null,
+        required: false,
+        description: "User's avatar"
+    })
+    @IsOptional()
+    @Property()
+    avatar: string
+
+    @ApiProperty({
+        default: null,
+        required: false,
+        description: "User's address"
+    })
+    @IsOptional()
+    @Property()
+    address: string
+    
 }

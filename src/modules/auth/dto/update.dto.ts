@@ -1,32 +1,33 @@
 import { IsString } from "class-validator";
 import { BaseDto } from "src/base/base.dto";
-import { Setting } from "src/entities/Setting";
+import { Auth } from "src/entities/Auth.entity";
 import { Property } from "src/utils/general.util";
 
 import { ApiProperty } from "@nestjs/swagger";
 
-export class CreateSettingDto extends BaseDto<Setting>{
+export class UpdateDto extends BaseDto<Auth> {
+ 
     @ApiProperty({
-        required: true,
-        description: "Setting name"
+        description: "User's phone number"
     })
+    // @IsString()
     @Property()
     @IsString()
-    name: string;
+    phoneNumber: string
 
     @ApiProperty({
-        required: true,
-        description: "Setting value"
+        description: "User's pass"
     })
+    // @IsString()
     @Property()
     @IsString()
-    value: string;
+    newPassword: string
 
     @ApiProperty({
-        required: true,
-        description: "Setting type"
+        description: "User's pass"
     })
+    // @IsString()
     @Property()
     @IsString()
-    type: string;
+    rePassword: string
 }

@@ -1,10 +1,10 @@
 import { BaseService } from "src/base/base.service";
 import { PaginationDto } from "src/base/pagination.dto";
+import { DefaultSetting } from "src/constants/app-setting";
 import { ErrorCodes } from "src/constants/error-code.const";
-import { User } from "src/entities/User";
+import { User } from "src/entities/User.entity";
 import { DatabaseError } from "src/exceptions/errors/database.error";
 import { LoggerService } from "src/logger/custom.logger";
-import { CreateUserDto } from "src/modules/user/dto/create-user.dto";
 import {
   DeleteResult,
   InsertResult,
@@ -12,20 +12,26 @@ import {
 } from "typeorm";
 
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
 
+import { CreateUserDto } from "./dto/create-user.dto";
 import { GetUserDto } from "./dto/get-user.dto";
 import { UserRepository } from "./user.repository";
 
 @Injectable()
 export class UserService extends BaseService<User, UserRepository> {
     constructor(
-        private readonly configService: ConfigService,
-        repository: UserRepository,
-        logger: LoggerService
+        @InjectRepository(User)
+        protected readonly repository: UserRepository,
+        protected readonly logger: LoggerService,
     ) {
         super(repository, logger)
     }
+
+    async getAll(): Promise<User[]> {
+        return await this.repository.find()
+    }
+
 
     /**
      * @param {string} code
@@ -34,7 +40,7 @@ export class UserService extends BaseService<User, UserRepository> {
      *
      * @returns Promise<GetUserDto | User>
      */
-    async getUser(
+     async getUser(
         code: string,
         getFullInfo: boolean = false,
         fields?: string[]
@@ -74,8 +80,7 @@ export class UserService extends BaseService<User, UserRepository> {
      * @returns Promise<User>
      */
     async createUser(userData: CreateUserDto): Promise<User> {
-        userData.isPersonal = userData.isPersonal ?? 1
-
+        userData.avatar = DefaultSetting.DEFAULT_AVATAR
         const isDuplicated = await this.repository.findOne(
             {
                 where: [
@@ -103,7 +108,7 @@ export class UserService extends BaseService<User, UserRepository> {
             result = await this.repository.createQueryBuilder()
                 .insert()
                 .values(userData)
-                .execute()
+                .execute()            
         } catch (error: unknown) {
             if (error instanceof QueryFailedError) {
                 throw new DatabaseError("INSERT_ERROR",
@@ -115,6 +120,7 @@ export class UserService extends BaseService<User, UserRepository> {
             throw new DatabaseError("DATABASE_CONNECTION_ERROR",
                 error as Record<string, unknown>,
                 ErrorCodes.DATABASE_CONNECTION_ERROR)
+            
         }
 
         return new User(result.generatedMaps[0])
@@ -192,5 +198,21 @@ export class UserService extends BaseService<User, UserRepository> {
         userPagination.meta = rawPagination.meta
 
         return userPagination
+    }
+
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
+    async getUserById(id: number): Promise<User> {
+        const user = await this.repository.findOne(
+            {
+                where: [
+                    {id:id}
+                ]
+            }
+        )
+        return user
     }
 }
