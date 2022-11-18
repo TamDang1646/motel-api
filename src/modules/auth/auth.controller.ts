@@ -172,6 +172,18 @@ export class AuthController extends BaseController {
     async updateAuth(
         @Body() updateParams: UpdateDto
     ): Promise<any>{
+        if (updateParams.newPassword.trim().length < 8 || updateParams.rePassword.trim().length < 8) {
+            throw new InvalidValueError(
+                "Password must be longer than 8 characters",
+                "PASSWORD_INCORRECT",
+                ErrorCodes.PASSWORD_INCORRECT)
+        }
+        if (updateParams.newPassword != updateParams.rePassword) {
+            throw new InvalidValueError(
+                "PASSWORD_INCORRECT",
+                "PASSWORD_INCORRECT",
+                ErrorCodes.PASSWORD_INCORRECT)
+        }
         let phoneNumber = telephoneCheckAndGet(updateParams.phoneNumber)
         if (!phoneNumber) {
             throw new InvalidValueError(
