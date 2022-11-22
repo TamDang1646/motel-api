@@ -15,6 +15,7 @@ import { AllExceptionFilter } from "./filter/exception.filter";
 import { LoggerModule } from "./logger/logger.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { PostModule } from "./modules/post/post.module";
+import { PostSaveModule } from "./modules/postSave/postSave.module";
 import { UserModule } from "./modules/user/user.module";
 
 @Module({
@@ -27,7 +28,8 @@ import { UserModule } from "./modules/user/user.module";
         DatabaseModule,
         AuthModule,
         UserModule,
-        PostModule
+        PostModule,
+        PostSaveModule
     ],
     controllers: [AppController],
     providers: [
