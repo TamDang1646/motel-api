@@ -282,13 +282,15 @@ export class BaseService<T extends BaseEntity, R extends Repository<T>> implemen
         const list = await queryBuilder.getRawMany()
         const jobTable = customTable ?? this.repository.metadata.tableName
 
-        let listResult: T[] = list.map(item => {
-            let a: Record<string, unknown> = {}
+        const listResult: T[] = list.map(item => {
+            const a: Record<string, unknown> = {}
 
             Object.keys(item).forEach(key => {
                 if (key.lastIndexOf("id") === key.length - 2) {
-                    a[trim(key, jobTable + "_", true)] = parseInt(item[key], 10)
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                    a[trim(key, jobTable + "_", true)] = parseInt(item[key] ?? 0, 10)
                 } else {
+                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
                     a[trim(key, jobTable + "_", true)] = item[key], 10
                 }
             })

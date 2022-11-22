@@ -13,8 +13,12 @@ export default class ComponentService {
         private readonly userService: UserService,
         private i18n: MessageComponent,
     ) { }
-    
-    async checkPhoneExist(phoneNumber:string) {
+
+    async checkPhoneExist(phoneNumber: string) {
         return this.authService.getAuthByPhone(phoneNumber)
+    }
+
+    async setExtraData(data) {
+        data.author = await this.userService.getUserById(data.authorId)
     }
 }
