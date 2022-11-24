@@ -14,12 +14,13 @@ import { PostService } from "../post/post.service";
 import { UserService } from "../user/user.service";
 import { PostSaveController } from "./postSave.controller";
 import PostSaveRepository from "./PostSave.repository";
+import { PostSaveService } from "./postSave.service";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([PostSave, PostSaveRepository, User, Auth, Posts]),
     ],
-    providers: [MessageComponent, ApiResponseService, UserService, ComponentService, AuthServices, PostService],
+    providers: [MessageComponent, ApiResponseService, UserService, ComponentService, AuthServices, PostService, PostSaveService],
     exports: [TypeOrmModule],
     controllers: [PostSaveController],
 })

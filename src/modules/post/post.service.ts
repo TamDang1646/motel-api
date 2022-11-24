@@ -55,7 +55,7 @@ export class PostService extends BaseService<Posts, PostRepository> {
         if (params.status) {
             query.andWhere("status = :status", { status: params.status })
         }
-
+        query.orderBy("id", "DESC")
         console.log("quey", await query.getQuery());
 
         // return await query.execute()

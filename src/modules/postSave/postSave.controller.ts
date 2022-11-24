@@ -1,9 +1,14 @@
 import { BaseController } from "src/base/base.controller";
 import ComponentService from "src/components/component";
 import { MessageComponent } from "src/components/message.component";
+import { TokenDto } from "src/dtos/token.dto";
 
 import {
+  Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   Post,
   Query,
 } from "@nestjs/common";
@@ -16,6 +21,7 @@ import {
 import { PostService } from "../post/post.service";
 import { UserService } from "../user/user.service";
 import { SaveDto } from "./dto/save.dto";
+import { PostSaveService } from "./postSave.service";
 
 @ApiBearerAuth()
 @ApiTags('Post save')
@@ -25,6 +31,7 @@ export class PostSaveController extends BaseController {
     constructor(
         private readonly userService: UserService,
         private readonly postService: PostService,
+        private readonly saveService: PostSaveService,
         private readonly configService: ConfigService,
         private readonly component: ComponentService,
         private i18n: MessageComponent,
@@ -32,10 +39,59 @@ export class PostSaveController extends BaseController {
         super(i18n);
     }
 
+    @Get()
+    async getSave(
+        @Query() token: TokenDto,
+        @Query() param: SaveDto,
+    ): Promise<any> {
+        try {
+            return await this.saveService.getSave(token.userId, param.postId)
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
+    /**
+     * 
+     * @param params 
+     * @returns 
+     */
     @Post()
     async savePost(
-        @Query() params: SaveDto
+        @Body() param: SaveDto,
     ): Promise<any> {
-        return params
+        try {
+            const res = await this.saveService.savePost(param.postId, param.userId)
+            if (res) {
+                return {
+                    message: "Lưu thành công",
+                }
+            }
+        }
+        catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
+
+
+    @Delete("/:postId/:userId")
+    async deleteSave(
+        // @Query() param: SaveDto,
+        @Param("postId") postId: number,
+        @Param("userId") userId: number,
+
+    ): Promise<any> {
+        console.log("param", postId, userId);
+
+        try {
+            const res = await this.saveService.deleteSave(postId, userId)
+            if (res) {
+                return {
+                    message: "Huỷ lưu thành công",
+                }
+            }
+        }
+        catch (error) {
+            this.throwErrorProcess(error)
+        }
     }
 }

@@ -40,7 +40,7 @@ export class PostController extends BaseController {
         super(i18n);
     }
 
-    @Get("")
+    @Get()
     async findPost(
         @Query() token: TokenDto,
         @Query() paging: iPaginationOption,
@@ -58,7 +58,7 @@ export class PostController extends BaseController {
             const getPostData = postData as unknown as PaginatedDto<GetPostEXDto>
             for (const rs of getPostData.data) {
                 // Get more company address data
-                await this.component.setExtraData(rs)
+                await this.component.setExtraData(rs, token)
             }
             return getPostData
         } catch (error) {

@@ -10,7 +10,7 @@ export class PostSave extends BaseEntity {
     id: number;
 
     @Column("int", { unique: true, name: "user_id" })
-    userId: string;
+    userId: number;
 
     @Column("int", { unique: true, name: "post_id" })
     postId: number;
@@ -27,4 +27,9 @@ export class PostSave extends BaseEntity {
         default: () => "CURRENT_TIMESTAMP",
     })
     updatedAt: Date;
+
+    constructor(partial: Partial<PostSave>) {
+        super();
+        Object.assign(this, partial);
+    }
 }
