@@ -162,6 +162,33 @@ export class UserService extends BaseService<User, UserRepository> {
         return await this.repository.findOne({ where: { code: code } })
     }
 
+    async updateTotalPost(id: number) {
+        try {
+            //Update Record in User Table
+            console.log("userID", id);
+
+            const res = await this.repository.createQueryBuilder()
+                .update()
+                .set({ totalPost: () => "total_post + 1" })
+                .where("id = :id", { id: id })
+                .execute()
+
+        } catch (error: unknown) {
+            if (error instanceof QueryFailedError) {
+                throw new DatabaseError(
+                    "UPDATE_ERROR",
+                    error as unknown as Record<string, unknown>,
+                    ErrorCodes.UPDATE_ERROR)
+            }
+            throw new DatabaseError(
+                "DATABASE_CONNECTION_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.DATABASE_CONNECTION_ERROR)
+        }
+
+        return await this.repository.findOne({ where: { id: id } })
+    }
+
     /**
      * @param {string} code
      *

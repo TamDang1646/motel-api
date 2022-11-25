@@ -5,11 +5,15 @@ import ComponentService from "src/components/component";
 import { MessageComponent } from "src/components/message.component";
 import { ErrorCodes } from "src/constants/error-code.const";
 import { TokenDto } from "src/dtos/token.dto";
+import { Posts } from "src/entities/Posts.entity";
 import { InvalidValueError } from "src/exceptions/errors/invalid-value.error";
 
 import {
+  Body,
   Controller,
   Get,
+  Param,
+  Post,
   Query,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
@@ -19,6 +23,7 @@ import {
 } from "@nestjs/swagger";
 
 import { UserService } from "../user/user.service";
+import { CreatePostDto } from "./dto/create-post.dto";
 import {
   GetPostDto,
   GetPostEXDto,
@@ -66,6 +71,42 @@ export class PostController extends BaseController {
         }
     }
 
-    // @Post()
+    @Get("/save-post/:id")
+    async getSavePost(
+        @Param("id") id: number
+    ): Promise<Posts[]> {
+        try {
+            const res = await this.postService.getUserSavePost(id)
+            return res.map((item) => ({ ...item, isSave: 1 }))
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
+
+
+    @Post()
+    async createPost(
+        @Body() postData: CreatePostDto
+    ): Promise<Posts> {
+        console.log("postData", postData);
+
+        let user = await this.userService.getUserById(postData.authorId)
+        if (!user) {
+            throw new InvalidValueError(
+                "USER_NOT_EXIST",
+                "USER_NOT_EXIST",
+                ErrorCodes.INVALID_USER_CODE)
+        }
+        try {
+
+            const res = await this.postService.createPost(postData)
+            if (res) {
+                await this.userService.updateTotalPost(postData.authorId)
+            }
+            return res
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
 
 }

@@ -1,12 +1,20 @@
 import queryString from "query-string";
 import { BaseService } from "src/base/base.service";
 import { iPaginationOption } from "src/base/pagination.dto";
+import { ErrorCodes } from "src/constants/error-code.const";
 import { Posts } from "src/entities/Posts.entity";
+import { PostSave } from "src/entities/PostSave.entity";
+import { DatabaseError } from "src/exceptions/errors/database.error";
 import { LoggerService } from "src/logger/custom.logger";
+import {
+  InsertResult,
+  QueryFailedError,
+} from "typeorm";
 
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
+import { CreatePostDto } from "./dto/create-post.dto";
 import { GetPostDto } from "./dto/get-post.dto";
 import { PostRepository } from "./post.repository";
 
@@ -18,6 +26,17 @@ export class PostService extends BaseService<Posts, PostRepository> {
         protected readonly logger: LoggerService,
     ) {
         super(repository, logger)
+    }
+
+    async getUserSavePost(userId: number) {
+        const query = this.repository.manager.createQueryBuilder(Posts, "post")
+            .select("post.*")
+            .innerJoin(PostSave, "ps", "post.id=ps.post_id AND ps.user_id=:userId", { userId })
+            // .innerJoinAndMapMany(PostSave, "post_save", "post.id= post_save.post_id", "post_save.user_id= :userId", { userId })
+            .orderBy("post.id", "DESC")
+        console.log("query", query.getQuery());
+
+        return query.getRawMany()
     }
 
     async find(params: GetPostDto, paging: iPaginationOption) {
@@ -40,11 +59,20 @@ export class PostService extends BaseService<Posts, PostRepository> {
         if (params.title) {
             query.andWhere("title like :title", { title: `%${params.title}%` })
         }
-        if (params.minPrice) {
-            query.andWhere("price >= :minPrice", { minPrice: params.minPrice })
-        }
-        if (params.maxPrice) {
-            query.andWhere("price <= :maxPrice", { maxPrice: params.maxPrice })
+        if (params.postType && params.postType == 1) {
+            if (params.minPrice) {
+                query.andWhere("min_price >= :minPrice", { minPrice: params.minPrice })
+            }
+            if (params.maxPrice) {
+                query.andWhere("max_price <= :maxPrice", { maxPrice: params.maxPrice })
+            }
+        } else {
+            if (params.minPrice) {
+                query.andWhere("price >= :minPrice", { minPrice: params.minPrice })
+            }
+            if (params.maxPrice) {
+                query.andWhere("price <= :maxPrice", { maxPrice: params.maxPrice })
+            }
         }
         if (params.address) {
             query.andWhere("address like :address", { address: `%${params.address}%` })
@@ -65,5 +93,31 @@ export class PostService extends BaseService<Posts, PostRepository> {
             paging.limit as number,
             queryString.stringify({ ...params, ...paging })
         )
+    }
+
+
+    async createPost(postData: CreatePostDto): Promise<Posts> {
+
+        let result: InsertResult
+        try {
+            result = await this.repository.createQueryBuilder()
+                .insert()
+                .values(postData)
+                .execute()
+        } catch (error: unknown) {
+            if (error instanceof QueryFailedError) {
+                throw new DatabaseError("INSERT_ERROR",
+                    error as unknown as Record<string, unknown>,
+                    ErrorCodes.INSERT_ERROR)
+            }
+
+
+            throw new DatabaseError("DATABASE_CONNECTION_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.DATABASE_CONNECTION_ERROR)
+
+        }
+
+        return new Posts(result.generatedMaps[0])
     }
 }

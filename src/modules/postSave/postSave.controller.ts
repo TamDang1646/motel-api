@@ -1,7 +1,6 @@
 import { BaseController } from "src/base/base.controller";
 import ComponentService from "src/components/component";
 import { MessageComponent } from "src/components/message.component";
-import { TokenDto } from "src/dtos/token.dto";
 
 import {
   Body,
@@ -20,7 +19,10 @@ import {
 
 import { PostService } from "../post/post.service";
 import { UserService } from "../user/user.service";
-import { SaveDto } from "./dto/save.dto";
+import {
+  GetSaveDto,
+  SaveDto,
+} from "./dto/save.dto";
 import { PostSaveService } from "./postSave.service";
 
 @ApiBearerAuth()
@@ -39,13 +41,35 @@ export class PostSaveController extends BaseController {
         super(i18n);
     }
 
-    @Get()
-    async getSave(
-        @Query() token: TokenDto,
-        @Query() param: SaveDto,
+    /**
+     * 
+     * @param id 
+     * @returns 
+     */
+    @Get("/:id")
+    async getSaveForUser(
+        // @Query() token: TokenDto,
+        @Param("id") id: number,
     ): Promise<any> {
         try {
-            return await this.saveService.getSave(token.userId, param.postId)
+            return await this.saveService.getSaveForUser(id)
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
+
+    /**
+     * 
+     * @param param 
+     * @returns 
+     */
+    @Get()
+    async getSave(
+        // @Query() token: TokenDto,
+        @Query() param: GetSaveDto,
+    ): Promise<any> {
+        try {
+            return await this.saveService.getSave(param.userId, param.postId)
         } catch (error) {
             this.throwErrorProcess(error)
         }

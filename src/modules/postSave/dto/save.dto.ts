@@ -24,3 +24,23 @@ export class SaveDto extends BaseDto<PostSave>{
     @IsOptional()
     postId: number
 }
+
+export class GetSaveDto extends BaseDto<PostSave>{
+    @ApiProperty({
+        description: "Save userId",
+        required: false
+    })
+    // @IsString()
+    @Property()
+    @IsOptional()
+    userId: number
+
+    @ApiProperty({
+        description: "Post id",
+        required: false
+    })
+    // @IsString()
+    @Property()
+    @IsOptional()
+    postId: number
+}

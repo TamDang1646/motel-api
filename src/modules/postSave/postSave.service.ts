@@ -23,7 +23,15 @@ export class PostSaveService extends BaseService<PostSave, PostSaveRepository> {
         super(repository, logger)
     }
 
-
+    async getSaveForUser(userId): Promise<PostSave[]> {
+        return await this.repository.find(
+            {
+                where: [
+                    { userId: userId }
+                ]
+            }
+        )
+    }
     async getSave(userId, postId): Promise<PostSave> {
 
         return await this.repository.findOne(
