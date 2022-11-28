@@ -27,10 +27,12 @@ export class createTableReport1669351598436 implements MigrationInterface {
                     {
                         name: "reported_user",
                         type: "int",
+                        default: 0
                     },
                     {
                         name: "reported_post",
                         type: "int",
+                        default: 0
                     },
                     {
                         name: "created_at",

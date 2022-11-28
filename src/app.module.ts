@@ -16,6 +16,7 @@ import { LoggerModule } from "./logger/logger.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { PostModule } from "./modules/post/post.module";
 import { PostSaveModule } from "./modules/postSave/postSave.module";
+import { ReportModule } from "./modules/report/report.module";
 import { UserModule } from "./modules/user/user.module";
 
 @Module({
@@ -29,7 +30,8 @@ import { UserModule } from "./modules/user/user.module";
         AuthModule,
         UserModule,
         PostModule,
-        PostSaveModule
+        PostSaveModule,
+        ReportModule
     ],
     controllers: [AppController],
     providers: [
