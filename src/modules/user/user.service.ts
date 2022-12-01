@@ -40,7 +40,7 @@ export class UserService extends BaseService<User, UserRepository> {
      *
      * @returns Promise<GetUserDto | User>
      */
-     async getUser(
+    async getUser(
         code: string,
         getFullInfo: boolean = false,
         fields?: string[]
@@ -108,7 +108,7 @@ export class UserService extends BaseService<User, UserRepository> {
             result = await this.repository.createQueryBuilder()
                 .insert()
                 .values(userData)
-                .execute()            
+                .execute()
         } catch (error: unknown) {
             if (error instanceof QueryFailedError) {
                 throw new DatabaseError("INSERT_ERROR",
@@ -120,7 +120,7 @@ export class UserService extends BaseService<User, UserRepository> {
             throw new DatabaseError("DATABASE_CONNECTION_ERROR",
                 error as Record<string, unknown>,
                 ErrorCodes.DATABASE_CONNECTION_ERROR)
-            
+
         }
 
         return new User(result.generatedMaps[0])
@@ -138,11 +138,13 @@ export class UserService extends BaseService<User, UserRepository> {
     ): Promise<User> {
         try {
             //Update Record in User Table
-            await this.repository.createQueryBuilder()
+
+            const res = await this.repository.createQueryBuilder()
                 .update()
                 .set(userData)
                 .where("code = :code", { code: code })
                 .execute()
+            console.log("data", userData);
 
         } catch (error: unknown) {
             if (error instanceof QueryFailedError) {
@@ -158,6 +160,33 @@ export class UserService extends BaseService<User, UserRepository> {
         }
 
         return await this.repository.findOne({ where: { code: code } })
+    }
+
+    async updateTotalPost(id: number) {
+        try {
+            //Update Record in User Table
+            console.log("userID", id);
+
+            const res = await this.repository.createQueryBuilder()
+                .update()
+                .set({ totalPost: () => "total_post + 1" })
+                .where("id = :id", { id: id })
+                .execute()
+
+        } catch (error: unknown) {
+            if (error instanceof QueryFailedError) {
+                throw new DatabaseError(
+                    "UPDATE_ERROR",
+                    error as unknown as Record<string, unknown>,
+                    ErrorCodes.UPDATE_ERROR)
+            }
+            throw new DatabaseError(
+                "DATABASE_CONNECTION_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.DATABASE_CONNECTION_ERROR)
+        }
+
+        return await this.repository.findOne({ where: { id: id } })
     }
 
     /**
@@ -206,13 +235,43 @@ export class UserService extends BaseService<User, UserRepository> {
      * @returns 
      */
     async getUserById(id: number): Promise<User> {
+        // console.log("id", id);
+
+        // const query = this.repository.createQueryBuilder()
+        // query.select("*")
+        //     .where("id = :id", { id })
         const user = await this.repository.findOne(
             {
                 where: [
-                    {id:id}
+                    { id: id }
                 ]
             }
         )
         return user
+        // console.log("userQuery", query.getQuery());
+
+        // return query.getOne()
+    }
+
+
+    async updateUserById(id, data: unknown): Promise<any> {
+        try {
+            const result = await this.repository.update(id, data)
+            if (result.affected) {
+                return await this.repository.findOneBy({ id })
+            } else {
+                throw new DatabaseError(
+                    "UPDATE_ERROR",
+                    "UserId không tồn tại",
+                    ErrorCodes.UPDATE_ERROR
+                )
+            }
+        } catch (error) {
+            throw new DatabaseError(
+                "UPDATE_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.UPDATE_ERROR
+            )
+        }
     }
 }

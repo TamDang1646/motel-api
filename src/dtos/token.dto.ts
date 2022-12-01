@@ -1,22 +1,28 @@
+import { IsOptional } from "class-validator";
+import { BaseDto } from "src/base/base.dto";
+import { Token } from "src/entities/Token.entity";
 import { Property } from "src/utils/general.util";
 
-import { BaseDto } from "../base/base.dto";
+import { ApiProperty } from "@nestjs/swagger";
 
-class Obj { }
-
-export class TokenDto extends BaseDto<Obj> {
+export class TokenDto extends BaseDto<Token>{
+    @ApiProperty({
+        description: "Post's id",
+        required: false
+    })
+    // @IsString()
     @Property()
-    userId: number;
+    @IsOptional()
+    userId: number
 
+    @ApiProperty({
+        description: "Post's author",
+        required: false
+    })
+    // @IsString()
     @Property()
-    role: string;
+    @IsOptional()
+    // @IsNumber()
+    code: string
 
-    @Property()
-    userCode: string;
-
-    @Property()
-    lang: string;
-
-    @Property()
-    apiKey: string;
 }
