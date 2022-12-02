@@ -49,7 +49,7 @@ async function bootstrap() {
 
     MessageComponent.init();
     const configService = app.get(ConfigService);
-    const port = String(configService.get("PORT") ?? 3000)
+    const port = String(configService.get("PORT") || 3000)
 
     await connectionSource.initialize();
 
@@ -87,7 +87,7 @@ async function bootstrap() {
     if (!process.env.TZ) {
         process.env.TZ = "Asia/Ho_Chi_Minh"
     }
-    await app.listen(port, "0.0.0.0");
+    await app.listen(port, "0.0.0.0" || "https://motelapi.herokuapp.com");
 
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
