@@ -14,7 +14,6 @@ export default class UpdateUserDto extends BaseDto<User> {
         required: true,
         description: "User's id"
     })
-    @IsOptional()
     @IsNumber()
     @Property()
     id: number

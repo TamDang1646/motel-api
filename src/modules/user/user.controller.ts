@@ -68,6 +68,7 @@ export class UserController extends BaseController {
     async updateUser(
         @Body() updateParams: UpdateUserDto
     ): Promise<User> {
+        console.log("updateParams", updateParams);
 
         let user = await this.userService.getUserById(updateParams.id)
         if (!user) {
