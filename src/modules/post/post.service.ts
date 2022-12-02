@@ -28,15 +28,20 @@ export class PostService extends BaseService<Posts, PostRepository> {
         super(repository, logger)
     }
 
-    async getUserSavePost(userId: number) {
+    async getUserSavePost(userId: number, paging: iPaginationOption) {
         const query = this.repository.manager.createQueryBuilder(Posts, "post")
             .select("post.*")
             .innerJoin(PostSave, "ps", "post.id=ps.post_id AND ps.user_id=:userId", { userId })
             // .innerJoinAndMapMany(PostSave, "post_save", "post.id= post_save.post_id", "post_save.user_id= :userId", { userId })
             .orderBy("post.id", "DESC")
         console.log("query", query.getQuery());
-
-        return query.getRawMany()
+        return await this.iPaginateCustom<Posts>(
+            query,
+            paging.page as number,
+            paging.limit as number,
+            // queryString.stringify({ ...params, ...paging })
+        )
+        // return query.getRawMany()
     }
 
     async find(params: GetPostDto, paging: iPaginationOption) {

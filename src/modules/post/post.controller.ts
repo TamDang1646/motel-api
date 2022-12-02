@@ -73,11 +73,20 @@ export class PostController extends BaseController {
 
     @Get("/save-post/:id")
     async getSavePost(
-        @Param("id") id: number
-    ): Promise<Posts[]> {
+        @Param("id") id: number,
+        @Query() paging: iPaginationOption,
+    ): Promise<any> {
         try {
-            const res = await this.postService.getUserSavePost(id)
-            return res.map((item) => ({ ...item, isSave: 1 }))
+            let token = new TokenDto
+            token.userId = id
+            const res = await this.postService.getUserSavePost(id, paging)
+            const getPostData = res as unknown as PaginatedDto<GetPostEXDto>
+            for (const rs of getPostData.data) {
+                // Get more company address data
+                await this.component.setExtraData(rs, token)
+            }
+            return getPostData
+            // return res.map((item) => ({ ...item, isSave: 1 }))
         } catch (error) {
             this.throwErrorProcess(error)
         }
