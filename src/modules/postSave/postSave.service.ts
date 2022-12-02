@@ -11,7 +11,7 @@ import {
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import PostSaveRepository from "./PostSave.repository";
+import PostSaveRepository from "../postSave/postSave.repository";
 
 @Injectable()
 export class PostSaveService extends BaseService<PostSave, PostSaveRepository> {
