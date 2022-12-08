@@ -13,6 +13,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
 } from "@nestjs/common";
@@ -28,6 +29,7 @@ import {
   GetPostDto,
   GetPostEXDto,
 } from "./dto/get-post.dto";
+import { UpdatePostDto } from "./dto/update-post.dto";
 import { PostService } from "./post.service";
 
 @ApiBearerAuth()
@@ -118,4 +120,17 @@ export class PostController extends BaseController {
         }
     }
 
+
+    @Patch()
+    async updatePost(
+        @Query() token: TokenDto,
+        @Body() postData: UpdatePostDto
+    ): Promise<any> {
+        console.log("token", token);
+        try {
+            // return await this.postService.update(user.id, updateParams as unknown as Record<string, unknown>)
+        } catch (error) {
+            this.throwErrorProcess(error)
+        }
+    }
 }

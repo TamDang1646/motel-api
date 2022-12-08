@@ -125,4 +125,25 @@ export class PostService extends BaseService<Posts, PostRepository> {
 
         return new Posts(result.generatedMaps[0])
     }
+
+    async updatePostById(id, data: unknown): Promise<any> {
+        try {
+            const result = await this.repository.update(id, data)
+            if (result.affected) {
+                return await this.repository.findOneBy({ id })
+            } else {
+                throw new DatabaseError(
+                    "UPDATE_ERROR",
+                    "UPDATE_ERROR",
+                    ErrorCodes.UPDATE_ERROR
+                )
+            }
+        } catch (error) {
+            throw new DatabaseError(
+                "UPDATE_ERROR",
+                error as Record<string, unknown>,
+                ErrorCodes.UPDATE_ERROR
+            )
+        }
+    }
 }
