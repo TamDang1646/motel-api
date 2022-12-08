@@ -121,14 +121,14 @@ export class PostController extends BaseController {
     }
 
 
-    @Patch()
+    @Patch("/:id")
     async updatePost(
-        @Query() token: TokenDto,
+        @Param("id") id: number,
         @Body() postData: UpdatePostDto
     ): Promise<any> {
-        console.log("token", token);
+        console.log("data", id, postData);
         try {
-            // return await this.postService.update(user.id, updateParams as unknown as Record<string, unknown>)
+            return await this.postService.updatePostById(id, postData as unknown as Record<string, unknown>)
         } catch (error) {
             this.throwErrorProcess(error)
         }

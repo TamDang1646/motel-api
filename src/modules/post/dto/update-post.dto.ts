@@ -10,14 +10,14 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class UpdatePostDto extends BaseDto<Posts>{
 
-    @ApiProperty({
-        description: "Post's id",
-        required: true
-    })
-    // @IsString()
-    @Property()
-    @IsOptional()
-    id: number
+    // @ApiProperty({
+    //     description: "Post's id",
+    //     required: true
+    // })
+    // // @IsString()
+    // @Property()
+    // @IsOptional()
+    // id: number
 
     @ApiProperty({
         description: "Post's title",
@@ -69,14 +69,14 @@ export class UpdatePostDto extends BaseDto<Posts>{
     @IsOptional()
     maxPrice: number
 
-    @ApiProperty({
-        description: "Post's time_unit",
-        required: false
-    })
-    // @IsNumber()
-    @Property()
-    @IsOptional()
-    time_unit: number
+    // @ApiProperty({
+    //     description: "Post's time_unit",
+    //     required: false
+    // })
+    // // @IsNumber()
+    // @Property()
+    // @IsOptional()
+    // time_unit: number
 
     @ApiProperty({
         description: "Post's address",

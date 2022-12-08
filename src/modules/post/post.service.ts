@@ -128,22 +128,29 @@ export class PostService extends BaseService<Posts, PostRepository> {
 
     async updatePostById(id, data: unknown): Promise<any> {
         try {
-            const result = await this.repository.update(id, data)
-            if (result.affected) {
-                return await this.repository.findOneBy({ id })
-            } else {
+            //Update Record in User Table
+
+            const res = await this.repository.createQueryBuilder()
+                .update()
+                .set(data)
+                .where("id = :id", { id: id })
+                .execute()
+
+
+        } catch (error: unknown) {
+            console.log("data", error);
+            if (error instanceof QueryFailedError) {
                 throw new DatabaseError(
                     "UPDATE_ERROR",
-                    "UPDATE_ERROR",
-                    ErrorCodes.UPDATE_ERROR
-                )
+                    error as unknown as Record<string, unknown>,
+                    ErrorCodes.UPDATE_ERROR)
             }
-        } catch (error) {
             throw new DatabaseError(
-                "UPDATE_ERROR",
+                "DATABASE_CONNECTION_ERROR",
                 error as Record<string, unknown>,
-                ErrorCodes.UPDATE_ERROR
-            )
+                ErrorCodes.DATABASE_CONNECTION_ERROR)
         }
+
+        return await this.repository.findOne({ where: { id: id } })
     }
 }
