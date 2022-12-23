@@ -20,8 +20,6 @@ import {
 } from "@nestjs/common";
 import { HttpArgumentsHost } from "@nestjs/common/interfaces";
 import { ConfigService } from "@nestjs/config";
-import * as Sentry from "@sentry/node";
-import { Primitive } from "@sentry/types";
 
 @Catch()
 @Injectable()
@@ -159,57 +157,6 @@ export class AllExceptionFilter implements ExceptionFilter {
         return [statusCode, errorCode]
     }
 
-    /**
-     * @param  {Request} request
-     * @returns void
-     */
-    private handleInfoSentry(sentry: typeof Sentry, request: Request, statusCode: number): void {
-        if (request) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            sentry.setTag("ip", JSON.stringify(request.headers["X-FORWARDED-FOR"]) + "," + request.ip)
-            sentry.setTag("queryquery", JSON.stringify(request.query))
-            sentry.setTag("method", request.method)
-
-            sentry.setExtra("body", request.body)
-
-            sentry.setTag("userAgent", request.headers["user-agent"])
-            sentry.setTag("logLevel", this.configService.get<Primitive>("logLevel"))
-            sentry.setTag("nodeEnv", this.configService.get<Primitive>("nodeEnv"))
-
-            const url: string = request.headers["x-envoy-original-path"] ? request.headers["x-envoy-original-path"] as string : request.url
-            sentry.setTag("url", `${request.hostname}${url}`)
-
-            sentry.setTag("statusCode", statusCode)
-
-            if (request.body["platform"]) {
-                sentry.setTag("platform", JSON.stringify(request.body["platform"]))
-            }
-
-            if (request.body["appVersion"]) {
-                sentry.setTag("appVersion", JSON.stringify(request.body["appVersion"]))
-            }
-
-            if (request.body["buildNumber"]) {
-                sentry.setTag("buildNumber", JSON.stringify(request.body["buildNumber"]))
-            }
-
-            if (request.headers["x-request-id"]) {
-                sentry.setTag("x-request-id", JSON.stringify(request.headers["x-request-id"]))
-            }
-
-            if (request.headers["x-role"]) {
-                sentry.setTag("x-role", JSON.stringify(request.headers["x-role"]))
-            }
-
-            if (request.headers["x-code"]) {
-                sentry.setTag("x-code", JSON.stringify(request.headers["x-code"]))
-            }
-
-            if (request.headers["x-id"]) {
-                sentry.setTag("x-id", JSON.stringify(request.headers["x-id"]))
-            }
-        }
-    }
 
     catch(exception: HttpException | Error, host: ArgumentsHost): void {
         const ctx: HttpArgumentsHost = host.switchToHttp()
@@ -223,10 +170,6 @@ export class AllExceptionFilter implements ExceptionFilter {
             errorCode !== 7200 &&
             errorCode !== 7201
         ) {
-            // const sentry: typeof Sentry = this.sentryService.instance()
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            // this.handleInfoSentry(sentry, host.getArgs()[0] as Request, statusCode)
-            // sentry.captureException(exception);
         }
     }
 

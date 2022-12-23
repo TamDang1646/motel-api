@@ -30,6 +30,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
                 entities: [
                     __dirname + "/../entities/*{.ts,.js}"
                 ],
+                autoLoadEntities: true,
             }),
             inject: [ConfigService],
         }),
